@@ -201,6 +201,6 @@ EnumMap EMI2CAddress(C_I2C_ADDRESS, "I2C-ADDRESS");
 EnumMap EMEcho(C_ECHO, "ECHO");
 
 
-CommandProcessor *cpList[12];
+CommandProcessor *cpList[15];
 
 CManager CommandManager(cpList);
