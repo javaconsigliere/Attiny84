@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <I2CUtil.h>
 #include <Command.h>
+#include <BasicI2CCommands.h>
 
 
 
@@ -15,16 +16,16 @@
 Command command = Command();
 
 
-EnumMap EMUsablePins[] =
-{
-  EnumMap(A1, "A1"),
-  EnumMap(A3, "A3"),
-  EnumMap(A5, "A5"),
-  EnumMap(A7, "A7"),
-  EnumMap(PB0, "PB0"),
-  EnumMap(PB2, "PB2"),
+// EnumMap EMUsablePins[] =
+// {
+//   EnumMap(A1, "A1"),
+//   EnumMap(A3, "A3"),
+//   EnumMap(A5, "A5"),
+//   EnumMap(A7, "A7"),
+//   EnumMap(PB0, "PB0"),
+//   EnumMap(PB2, "PB2"),
  
-};
+// };
 
 
 
@@ -36,178 +37,85 @@ EnumMap EMUsablePins[] =
 
 
 //////////////////////////////////////////////////////////////////////////////
-class CVersion:public CommandProcessor
-{
-  private:
-   const char * version;
-  public:
-    
 
-    CVersion(const char * v):CommandProcessor(&EMVersion)
-    {
-      version = v;
-    }
-    int run()
-    {
-      I2CUtil::write(version);
-      return OK;
-    }
-};
-CVersion Version("84-I2C-1.04.23");
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-class CUptime:public CommandProcessor
-{
-  public:
-    CUptime():CommandProcessor(&EMUptime)
-    {
-    }
-    int run()
-    {
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
-      I2CUtil::write((long)millis());
-      return OK;
-    }
-};
-CUptime Uptime;
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-class CPI2CAddress:public CommandProcessor
-{
-  private:
-    uint16_t i2cAddress = 0;
-  public:
-    CPI2CAddress():CommandProcessor(&EMI2CAddress)
-    {
-    }
-    boolean parseParameters(int offset, Command *cmd)
-    {
-      // I2C:S:address
-      if(getAction() == S && offset + 1 < cmd->getSize())
-      {
-        //i2cAddress = BytesToPrimitive::toInt((cmd->getCommand() + offset));
-        i2cAddress = cmd->getCommand()[offset++];
-        if(i2cAddress > 7 && i2cAddress < 128)
-          return true;
-      }
-      else if (getAction() == G)
-      {
-        return true;
-      }
-      return false;
-    }
-    int run()
-    {
-      uint8_t old = I2CConfig.getAddress();
-      if(getAction() == S || getAction() == U)
-      {
-        I2CConfig.setAddress(i2cAddress);
-      }
-
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
-      I2CUtil::write(old);
-      if(getAction() == S || getAction() == U)
-      {
-        //I2CConfig.setAddress(i2cAddress);
-        I2CUtil::write((uint8_t)':');
-        I2CUtil::write(I2CConfig.getAddress());
-      }
-      return OK;
-    }
-};
-CPI2CAddress I2CAddress;
+CVersion Version("84-I2C-1.04.26");
+EnumMap EMAref(C_CALIBRATE, "AREF");
+EnumMap EMReset(C_RESET, "RESET");
+EnumMap EMEcho(C_ECHO, "ECHO");
 //////////////////////////////////////////////////////////////////////////////
 
 
 
 //////////////////////////////////////////////////////////////////////////////
-class CPCPUSpeed:public CommandProcessor
-{
-  public:
-    CPCPUSpeed():CommandProcessor(&EMCPUSpeed)
-    {
-    }
-    int run()
-    {
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
-      I2CUtil::write(F_CPU);
-      return OK;
-    }
-};
-CPCPUSpeed CPUSpeed;
+
 //////////////////////////////////////////////////////////////////////////////
 
 
 //////////////////////////////////////////////////////////////////////////////
 // echo the received value int, long or byte
-class CPEcho:public CommandProcessor
-{
-  private:
-    long value;
-    int length;
-    EnumMap *current;
-  public:
-    CPEcho():CommandProcessor(&EMEcho)
-    {
+// class CPEcho:public CommandProcessor
+// {
+//   private:
+//     long value;
+//     int length;
+//     EnumMap *current;
+//   public:
+//     CPEcho():CommandProcessor(&EMEcho)
+//     {
 
-    }
-    boolean parseParameters(int offset, Command *cmd)
-    {
-      //ECHO:S:[I,L]:value
-      value = 0;
-      length = 0;
-      current = NULL;
-      if(getAction() == S && offset + 1 < cmd->getSize())
-      {
+//     }
+//     boolean parseParameters(int offset, Command *cmd)
+//     {
+//       //ECHO:S:[I,L]:value
+//       value = 0;
+//       length = 0;
+//       current = NULL;
+//       if(getAction() == S && offset + 1 < cmd->getSize())
+//       {
         
-        char * tok = (char *)cmd->getCommand();
-        current = EnumMap::match(tok + offset, &EMInt, &EMLong, NULL);
-        if(current != NULL)
-        {
-          offset+=2;
-          switch(current->map())
-          {
-            case INT:
-              value = BytesToPrimitive::toInt(cmd->getCommand() + offset);
-              length = 2;
-              break;
-            case LONG:
-              value = BytesToPrimitive::toLong(cmd->getCommand() + offset);
-              length = 4;
-              break;
-          }
-        }
-      }
-      return (length!=0);
-    }
+//         char * tok = (char *)cmd->getCommand();
+//         current = EnumMap::match(tok + offset, &EMInt, &EMLong, NULL);
+//         if(current != NULL)
+//         {
+//           offset+=2;
+//           switch(current->map())
+//           {
+//             case INT:
+//               value = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+//               length = 2;
+//               break;
+//             case LONG:
+//               value = BytesToPrimitive::toLong(cmd->getCommand() + offset);
+//               length = 4;
+//               break;
+//           }
+//         }
+//       }
+//       return (length!=0);
+//     }
 
-    int run()
-    {
-      // format OK:[I,L]:value
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
+//     int run()
+//     {
+//       // format OK:[I,L]:value
+//       I2CUtil::write(OK);
+//       I2CUtil::write((uint8_t)':');
       
-      I2CUtil::write((uint8_t) current->name()[0]);
-      I2CUtil::write((uint8_t)':');
+//       I2CUtil::write((uint8_t) current->name()[0]);
+//       I2CUtil::write((uint8_t)':');
       
-      switch(current->map())
-      { 
-        case INT:
-          I2CUtil::write((int) value);
-          break;
-        case LONG:
-          I2CUtil::write(value);
-          break;
-      }
-      return OK;
-    }
-};
-CPEcho Echo;
+//       switch(current->map())
+//       { 
+//         case INT:
+//           I2CUtil::write((int) value);
+//           break;
+//         case LONG:
+//           I2CUtil::write(value);
+//           break;
+//       }
+//       return OK;
+//     }
+// };
+// CPEcho Echo;
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -247,7 +155,7 @@ class CAref:public CommandProcessor
       return OK;
     }
 
-     int getAnalogAref()
+    int getAnalogAref()
     {
       aRefValue = analogRead(referencePin);
       return aRefValue;
@@ -260,33 +168,6 @@ class CAref:public CommandProcessor
 CAref ARef(ADC_PIN_AREF);
 //////////////////////////////////////////////////////////////////////////////
 
-
-//////////////////////////////////////////////////////////////////////////////
-class Counter : public CommandProcessor
-{
-  private:
-    long counter = 0;
-    boolean incOnRun = false;
-  public:
-    Counter(EnumMap *c, boolean cType) : CommandProcessor(c)
-    {
-      incOnRun = cType;
-    }
-    int run()
-    {
-      long val = incOnRun ? inc() : get();
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
-      I2CUtil::write(val);
-      
-      return OK;
-    }
-    long inc(){return ++counter;}
-    long get(){return counter;}
-};
-Counter I2CMessageCounter(&EMMessages, false);
-Counter PingCounter(&EMPing, true);
-//////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -342,12 +223,13 @@ void setup()
   CommandManager.add(&I2CMessageCounter);
   CommandManager.add(&PingCounter);
   CommandManager.add(&Version);
-  CommandManager.add(&Uptime);
+  //CommandManager.add(&Uptime);
   CommandManager.add(&ARef);
   CommandManager.add(&CPUSpeed);
   CommandManager.add(&Reset);
   CommandManager.add(&I2CAddress);
-  CommandManager.add(&Echo);
+  //CommandManager.add(&Echo);
+  CommandManager.add(&PinIO);
   
   // set the analog reference to external
   analogReference(EXTERNAL);

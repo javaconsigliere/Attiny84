@@ -22,15 +22,15 @@ enum COMMAND
   C_ECHO
 };
 
-extern EnumMap EMPing;
-extern EnumMap EMMessages;
-extern EnumMap EMAref;
-extern EnumMap EMReset;
-extern EnumMap EMCPUSpeed;
-extern EnumMap EMUptime;
-extern EnumMap EMVersion;
-extern EnumMap EMI2CAddress;
-extern EnumMap EMEcho;
+//extern EnumMap EMPing;
+//extern EnumMap EMMessages;
+// extern EnumMap EMAref;
+// extern EnumMap EMReset;
+// extern EnumMap EMCPUSpeed;
+// extern EnumMap EMUptime;
+//extern EnumMap EMVersion;
+//extern EnumMap EMI2CAddress;
+// extern EnumMap EMEcho;
 
 
 class Command
@@ -54,8 +54,7 @@ class Command
 class CommandProcessor : public Runnable
 {
   private:
-   
-    ACTION action;
+       ACTION action;
   protected:
     EnumMap *command;
   public:

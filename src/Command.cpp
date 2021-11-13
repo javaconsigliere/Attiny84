@@ -190,15 +190,15 @@ CommandProcessor * CManager::parse(Command *command)
 // TokenMap TMUpdate = TokenMap(U, "U", ENUM);
 // TokenMap TMDelete = TokenMap(D, "D", ENUM);
 
-EnumMap EMPing(C_PING, "PING");
-EnumMap EMMessages(C_MESSAGES, "MESSAGES");
-EnumMap EMAref(C_CALIBRATE, "AREF");
-EnumMap EMReset(C_RESET, "RESET");
-EnumMap EMCPUSpeed(C_CPU_SPEED, "CPU-SPEED");
-EnumMap EMUptime(C_UPTIME, "UPTIME");
-EnumMap EMVersion(C_VERSION, "VERSION");
-EnumMap EMI2CAddress(C_I2C_ADDRESS, "I2C-ADDRESS");
-EnumMap EMEcho(C_ECHO, "ECHO");
+// EnumMap EMPing(C_PING, "PING");
+// EnumMap EMMessages(C_MESSAGES, "MESSAGES");
+// EnumMap EMAref(C_CALIBRATE, "AREF");
+// EnumMap EMReset(C_RESET, "RESET");
+
+// // EnumMap EMUptime(C_UPTIME, "UPTIME");
+// //EnumMap EMVersion(C_VERSION, "VERSION");
+// //EnumMap EMI2CAddress(C_I2C_ADDRESS, "I2C-ADDRESS");
+// EnumMap EMEcho(C_ECHO, "ECHO");
 
 
 CommandProcessor *cpList[15];
