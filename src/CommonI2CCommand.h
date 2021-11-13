@@ -1,5 +1,5 @@
-#ifndef C_BASIC_I2C_COMMANDS
-#define C_BASIC_I2C_COMMANDS
+#ifndef C_COMMON_I2C_COMMAND
+#define C_COMMON_I2C_COMMAND
 #include<Command.h>
 #include<I2CUtil.h>
 

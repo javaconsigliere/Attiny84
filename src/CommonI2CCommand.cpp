@@ -1,4 +1,4 @@
-#include "BasicI2CCommands.h"
+#include "CommonI2CCommand.h"
 // IO
 EnumMap EMIO(C_IO, "IO");
 CPinIO::CPinIO():CommandProcessor(&EMIO)

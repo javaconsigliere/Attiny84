@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include <I2CUtil.h>
 #include <Command.h>
-#include <BasicI2CCommands.h>
+#include <CommonI2CCommand.h>
 
 
 
