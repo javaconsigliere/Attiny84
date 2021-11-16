@@ -33,6 +33,7 @@ int CPinIO::run()
                     //val = analogRead(pin);
                     break;
                 case IO_D:
+                    pinMode(pin, OUTPUT);
                     digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
                     //val = digitalRead(pin);
                     break;

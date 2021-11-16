@@ -40,7 +40,7 @@ Command command = Command();
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.04.58");
+CVersion Version("84-I2C-1.04.60");
 EnumMap EMAref(C_CALIBRATE, "AREF");
 EnumMap EMReset(C_RESET, "RESET");
 EnumMap EMEcho(C_ECHO, "ECHO");
@@ -245,10 +245,10 @@ void setup()
   Wire.onRequest(requestEvent);
 
   // Turn on LED when program starts
-  pinMode(A1, OUTPUT);
-  // pinMode(PB2, OUTPUT);
+  //pinMode(A1, OUTPUT);
+  //pinMode(PB2, OUTPUT);
   // digitalWrite(PB2, HIGH);
-  digitalWrite(A1, HIGH);
+  //digitalWrite(A1, HIGH);
   ARef.getAnalogAref(); // ARef value
     
     
