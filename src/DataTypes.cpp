@@ -20,11 +20,11 @@ EnumMap *EnumMap::match(const char * token, ...)
     va_list vl;
     va_start(vl, token);
 
-    for(int i = 0;;i++)
+    for(int i = 0; ret != NULL; i++)
     {
         ret = va_arg(vl, EnumMap *);
-        if(ret == NULL)
-            break;
+        // if(ret == NULL)
+        //     break;
         if(strncmp(ret->name(), token, strlen(ret->name())) == 0)
         {
             break;
@@ -68,3 +68,8 @@ EnumMap EMFloat(FLOAT,"F");
 EnumMap EMDouble(DOUBLE,"D");
 EnumMap EMString(STRING,"S");
 EnumMap EMEnum(ENUM,"E");
+
+
+EnumMap EMAnalog(IO_A, "A");
+EnumMap EMDigital(IO_D, "D");
+EnumMap EMPWM(IO_P, "P");

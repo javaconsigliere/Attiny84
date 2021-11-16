@@ -7,13 +7,132 @@ CPinIO::CPinIO():CommandProcessor(&EMIO)
 }
 int CPinIO::run()
 {
+    int val = 0;
+    switch(getAction())
+    {
+        // case G:
+        //     switch(iot)
+        //     {
+        //         case IO_A:
+        //             val = analogRead(pin);
+        //             break;
+        //         case IO_D:
+        //             val = digitalRead(pin);
+        //             break;
+        //         case IO_P:
+        //             break;
+        //     }
+        //     break;
+        case S:
+        case U:
+            switch(iot)
+            {
+                case IO_A:
+                    analogWrite(pin, setValue);
+                    //val = analogRead(pin);
+                    break;
+                case IO_D:
+                    digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
+                    //val = digitalRead(pin);
+                    break;
+                case IO_P:
+                    break;
+            }
+            // I2CUtil::write(OK);
+            // I2CUtil::write((uint8_t)':');
+            // I2CUtil::write((long)setValue);
+            // break;
+            
+        case G:
+            switch(iot)
+            {
+                case IO_A:
+                    val = analogRead(pin);
+                    break;
+                case IO_D:
+                    val = digitalRead(pin);
+                    break;
+                case IO_P:
+                    break;
+            }
+            I2CUtil::write(OK);
+            I2CUtil::write((uint8_t)':');
+            I2CUtil::write((uint8_t)pin);
+            I2CUtil::write((uint8_t)':');
+            I2CUtil::write((long)val);
+        break;
+    }
+    
+    
 
     return OK;
 }
 boolean CPinIO::parseParameters(int offset, Command *cmd)
 {
+    // full command IO:[G,S,U,D]:[A,D,P]:pin:value
+    setValue = -1;
+    // parsing [A,D,P]
+    if (offset < cmd->length())
+    {
+        // char tok[2];
+        // tok[1] = 0;
+        // tok[0] = cmd->getCommand()[offset++];
+        // EnumMap *ioType = EnumMap::match(tok, &EMAnalog, &EMDigital, &EMPWM, NULL);
+        // if (ioType == NULL)
+        //     return false;
+        // iot = (IO_TYPE)ioType->map();
 
-    return true;
+        char ioType = cmd->getCommand()[offset++];
+
+        switch(ioType)
+        {
+            case 'A':
+                iot = IO_A;
+                break;
+            case 'D':
+                iot = IO_D;
+                break;
+            // case 'P':
+            //     iot = IO_P;
+            //     break;
+            default:
+                return false;
+        }
+
+    }
+
+    if(offset  < cmd->length() && cmd->getCommand()[offset] == ':')
+    {
+        offset++;
+    }
+
+    // pin value one byte
+    if (offset < cmd->length())
+    {
+        pin = cmd->getCommand() [offset++];
+        //offset+=2;
+        
+        if(getAction() == G)
+        {
+            return true;
+        }
+        
+    }
+    
+    if(offset < cmd->length() && cmd->getCommand()[offset] == ':')
+    {
+        offset++;
+    }
+    // value
+    if (offset < cmd->length())
+    {
+        setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+        return true;
+    }
+
+    
+
+    return false;
 }
 CPinIO PinIO;
 // IO end
@@ -53,16 +172,16 @@ CI2CAddress::CI2CAddress():CommandProcessor(&EMI2CAddress)
 boolean CI2CAddress::parseParameters(int offset, Command *cmd)
 {
     // I2C:S:address
-    if(getAction() == S && offset + 1 < cmd->getSize())
+    if(getAction() == S && offset < cmd->length())
     {
-    //i2cAddress = BytesToPrimitive::toInt((cmd->getCommand() + offset));
-    i2cAddress = cmd->getCommand()[offset++];
-    if(i2cAddress > 7 && i2cAddress < 128)
-        return true;
+        //i2cAddress = BytesToPrimitive::toInt((cmd->getCommand() + offset));
+        i2cAddress = cmd->getCommand()[offset++];
+        if(i2cAddress > 7 && i2cAddress < 128)
+            return true;
     }
     else if (getAction() == G)
     {
-    return true;
+        return true;
     }
     return false;
 }

@@ -35,6 +35,13 @@ enum ACTION
  D
 };
 
+enum IO_TYPE
+{
+  IO_A, // analog
+  IO_D, // digital
+  IO_P, // PWM
+};
+
 
 
 enum HTTP_STATUS
@@ -74,5 +81,10 @@ extern EnumMap EMFloat;
 extern EnumMap EMDouble;
 extern EnumMap EMString;
 extern EnumMap EMEnum;
+
+
+extern EnumMap EMAnalog;
+extern EnumMap EMDigital;
+extern EnumMap EMPWM;
 
 #endif

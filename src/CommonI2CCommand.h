@@ -5,7 +5,12 @@
 
 class CPinIO : public CommandProcessor
 {
-    public:
+  private:
+    IO_TYPE iot;
+    uint8_t pin;
+    int setValue;
+
+  public:
     CPinIO();
     int run();
     boolean parseParameters(int offset, Command *cmd);

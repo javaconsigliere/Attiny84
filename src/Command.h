@@ -36,9 +36,9 @@ enum COMMAND
 class Command
 {
   private:
-      uint8_t data[COMMAND_BUFFER_SIZE];
+    uint8_t data[COMMAND_BUFFER_SIZE];
 	  int dataLen = 0;
-      int size = COMMAND_BUFFER_SIZE;
+    int size = COMMAND_BUFFER_SIZE;
 	
   public:
     
