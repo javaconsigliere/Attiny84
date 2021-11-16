@@ -8,6 +8,7 @@ CPinIO::CPinIO():CommandProcessor(&EMIO)
 int CPinIO::run()
 {
     int val = 0;
+    char iotchar;
     switch(getAction())
     {
         // case G:
@@ -48,19 +49,25 @@ int CPinIO::run()
             {
                 case IO_A:
                     val = analogRead(pin);
+                    iotchar = 'A';
                     break;
                 case IO_D:
                     val = digitalRead(pin);
+                    iotchar = 'D';
                     break;
                 case IO_P:
                     break;
             }
             I2CUtil::write(OK);
             I2CUtil::write((uint8_t)':');
+            I2CUtil::write((uint8_t)iotchar);
+            I2CUtil::write((uint8_t)':');
             I2CUtil::write((uint8_t)pin);
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((long)val);
         break;
+        default:
+            break;
     }
     
     

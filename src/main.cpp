@@ -40,7 +40,7 @@ Command command = Command();
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.04.56");
+CVersion Version("84-I2C-1.04.58");
 EnumMap EMAref(C_CALIBRATE, "AREF");
 EnumMap EMReset(C_RESET, "RESET");
 EnumMap EMEcho(C_ECHO, "ECHO");
@@ -55,69 +55,69 @@ EnumMap EMEcho(C_ECHO, "ECHO");
 
 //////////////////////////////////////////////////////////////////////////////
 // echo the received value int, long or byte
-class CPEcho:public CommandProcessor
-{
-  private:
-    long value;
-    int length;
-    EnumMap *current;
-  public:
-    CPEcho():CommandProcessor(&EMEcho)
-    {
+// class CPEcho:public CommandProcessor
+// {
+//   private:
+//     long value;
+//     int length;
+//     EnumMap *current;
+//   public:
+//     CPEcho():CommandProcessor(&EMEcho)
+//     {
 
-    }
-    boolean parseParameters(int offset, Command *cmd)
-    {
-      //ECHO:S:[I,L]:value
-      value = 0;
-      length = 0;
-      current = NULL;
-      if(getAction() == S && offset < cmd->length())
-      {
+//     }
+//     boolean parseParameters(int offset, Command *cmd)
+//     {
+//       //ECHO:S:[I,L]:value
+//       value = 0;
+//       length = 0;
+//       current = NULL;
+//       if(getAction() == S && offset < cmd->length())
+//       {
         
-        char * tok = (char *)cmd->getCommand();
-        current = EnumMap::match(tok + offset, &EMInt, &EMLong, NULL);
-        if(current != NULL)
-        {
-          offset+=2;
-          switch(current->map())
-          {
-            case INT:
-              value = BytesToPrimitive::toInt(cmd->getCommand() + offset);
-              length = 2;
-              break;
-            case LONG:
-              value = BytesToPrimitive::toLong(cmd->getCommand() + offset);
-              length = 4;
-              break;
-          }
-        }
-      }
-      return (length!=0);
-    }
+//         char * tok = (char *)cmd->getCommand();
+//         current = EnumMap::match(tok + offset, &EMInt, &EMLong, NULL);
+//         if(current != NULL)
+//         {
+//           offset+=2;
+//           switch(current->map())
+//           {
+//             case INT:
+//               value = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+//               length = 2;
+//               break;
+//             case LONG:
+//               value = BytesToPrimitive::toLong(cmd->getCommand() + offset);
+//               length = 4;
+//               break;
+//           }
+//         }
+//       }
+//       return (length!=0);
+//     }
 
-    int run()
-    {
-      // format OK:[I,L]:value
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
+//     int run()
+//     {
+//       // format OK:[I,L]:value
+//       I2CUtil::write(OK);
+//       I2CUtil::write((uint8_t)':');
       
-      I2CUtil::write((uint8_t) current->name()[0]);
-      I2CUtil::write((uint8_t)':');
+//       I2CUtil::write((uint8_t) current->name()[0]);
+//       I2CUtil::write((uint8_t)':');
       
-      switch(current->map())
-      { 
-        case INT:
-          I2CUtil::write((int) value);
-          break;
-        case LONG:
-          I2CUtil::write(value);
-          break;
-      }
-      return OK;
-    }
-};
-CPEcho Echo;
+//       switch(current->map())
+//       { 
+//         case INT:
+//           I2CUtil::write((int) value);
+//           break;
+//         case LONG:
+//           I2CUtil::write(value);
+//           break;
+//       }
+//       return OK;
+//     }
+// };
+// CPEcho Echo;
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ void setup()
   CommandManager.add(&CPUSpeed);
   CommandManager.add(&Reset);
   CommandManager.add(&I2CAddress);
-  CommandManager.add(&Echo);
+  // CommandManager.add(&Echo);
   CommandManager.add(&PinIO);
   
   // set the analog reference to external
@@ -246,8 +246,8 @@ void setup()
 
   // Turn on LED when program starts
   pinMode(A1, OUTPUT);
-  pinMode(PB2, OUTPUT);
-  digitalWrite(PB2, HIGH);
+  // pinMode(PB2, OUTPUT);
+  // digitalWrite(PB2, HIGH);
   digitalWrite(A1, HIGH);
   ARef.getAnalogAref(); // ARef value
     
