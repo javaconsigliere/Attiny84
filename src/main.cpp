@@ -40,7 +40,7 @@ Command command = Command();
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.04.55");
+CVersion Version("84-I2C-1.04.56");
 EnumMap EMAref(C_CALIBRATE, "AREF");
 EnumMap EMReset(C_RESET, "RESET");
 EnumMap EMEcho(C_ECHO, "ECHO");
