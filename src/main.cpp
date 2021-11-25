@@ -40,9 +40,11 @@ Command command = Command();
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.04.60");
+CVersion Version("84-I2C-1.04.61");
+CUptime Uptime;
+CReset Reset(RESET_PIN_CONTROLLER);
 EnumMap EMAref(C_CALIBRATE, "AREF");
-EnumMap EMReset(C_RESET, "RESET");
+
 EnumMap EMEcho(C_ECHO, "ECHO");
 //////////////////////////////////////////////////////////////////////////////
 
@@ -121,20 +123,6 @@ EnumMap EMEcho(C_ECHO, "ECHO");
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-class CPReset:public CommandProcessor
-{
-  public:
-    CPReset():CommandProcessor(&EMReset)
-    {
-    }
-    int run()
-    {
-      pinMode(RESET_PIN_CONTROLLER, OUTPUT);
-      digitalWrite(RESET_PIN_CONTROLLER, LOW);
-      return OK;
-    }
-};
-CPReset Reset;
 //////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
@@ -225,7 +213,7 @@ void setup()
   CommandManager.add(&I2CMessageCounter);
   CommandManager.add(&PingCounter);
   CommandManager.add(&Version);
-  //CommandManager.add(&Uptime);
+  CommandManager.add(&Uptime);
   CommandManager.add(&ARef);
   CommandManager.add(&CPUSpeed);
   CommandManager.add(&Reset);

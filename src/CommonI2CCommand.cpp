@@ -161,6 +161,25 @@ int CCPUSpeed::run()
 }
 CCPUSpeed CPUSpeed;
 // CPU-SPEED end
+
+
+// UPTIME
+EnumMap EMCUptime(C_UPTIME, "UPTIME");
+CUptime::CUptime():CommandProcessor(&EMCUptime)
+{
+}
+
+int CUptime::run()
+{
+
+    I2CUtil::write(OK);
+    I2CUtil::write((uint8_t)':');
+    I2CUtil::write((long)millis());
+    return OK;
+}
+// UPTIME end
+
+// VERSION
 EnumMap EMVersion(C_VERSION, "VERSION");
 CVersion::CVersion(const char * v):CommandProcessor(&EMVersion)
 {
@@ -171,8 +190,24 @@ int CVersion::run()
     I2CUtil::write(version);
     return OK;
 }
+// VERSION END
 
 
+// RESET
+EnumMap EMReset(C_RESET, "RESET");
+CReset::CReset(uint8_t pin):CommandProcessor(&EMReset)
+{
+    resetPin = pin;
+}
+int CReset::run()
+{
+    pinMode(resetPin, OUTPUT);
+    digitalWrite(resetPin, LOW);
+    return OK;
+}
+// RESET end
+
+// I2C-ADDRESS
 EnumMap EMI2CAddress(C_I2C_ADDRESS, "I2C-ADDRESS");
 CI2CAddress::CI2CAddress():CommandProcessor(&EMI2CAddress)
 {
@@ -214,7 +249,7 @@ int CI2CAddress::run()
 }
 
 CI2CAddress I2CAddress;
-
+// I2C-ADDRESS end
 
 
 

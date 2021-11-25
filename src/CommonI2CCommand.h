@@ -67,6 +67,28 @@ class Counter : public CommandProcessor
     long inc();
     long get();
 };
+
+class CUptime : public CommandProcessor
+{
+  public:
+    CUptime();
+    int run();
+};
+
+class CReset : public CommandProcessor
+{
+  private:
+    uint8_t resetPin;
+
+  public:
+    CReset(uint8_t pin);
+    int run();
+};
+
+
+
+
+
 extern Counter I2CMessageCounter;
 extern Counter PingCounter;
 
