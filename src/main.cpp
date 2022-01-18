@@ -2,6 +2,7 @@
 #include <I2CUtil.h>
 #include <Command.h>
 #include <CommonI2CCommand.h>
+#include <Servo.h>
 
 
 // #ifdef PINMAPPING_CCW
