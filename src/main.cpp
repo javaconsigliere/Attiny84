@@ -2,6 +2,8 @@
 #include <I2CUtil.h>
 #include <Command.h>
 #include <CommonI2CCommand.h>
+// adding support for stepper motor
+#include <Stepper.h>
 
 
 
