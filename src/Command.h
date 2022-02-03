@@ -53,10 +53,11 @@ class Command
 
 class CommandProcessor : public Runnable
 {
-  private:
-       ACTION action;
+  
+      
   protected:
     EnumMap *command;
+     ACTION action;
   public:
     CommandProcessor(EnumMap *c);
     virtual boolean parseParameters(int offset, Command *cmd);

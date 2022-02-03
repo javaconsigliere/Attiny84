@@ -44,7 +44,7 @@ bool busy = false;
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.05.10");
+CVersion Version("84-I2C-1.05.15");
 CUptime Uptime;
 CReset Reset(RESET_PIN_CONTROLLER);
 EnumMap EMAref(C_CALIBRATE, "AREF");
@@ -228,7 +228,7 @@ void setup()
   CommandManager.add(&PinIO);
   
   // set the analog reference to external
-  //analogReference(EXTERNAL);
+  analogReference(EXTERNAL);
 
   
 
@@ -264,7 +264,8 @@ void loop()
     
   // adding delays create i2c issues
 
-   //delay(10);
+  delay(1);
+  loopCounter++;
   
 }
  
