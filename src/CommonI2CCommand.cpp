@@ -9,6 +9,7 @@ int CPinIO::run()
 {
     int val = 0;
     char iotchar;
+   
     switch(getAction())
     {
         // case G:
@@ -33,8 +34,10 @@ int CPinIO::run()
                     //val = analogRead(pin);
                     break;
                 case IO_D:
+                    
                     pinMode(pin, OUTPUT);
-                    digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
+                    if(setValue != -1)
+                        digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
                     //val = digitalRead(pin);
                     break;
                 case IO_P:
@@ -70,7 +73,6 @@ int CPinIO::run()
         default:
             break;
     }
-    
     
 
     return OK;
@@ -132,9 +134,14 @@ boolean CPinIO::parseParameters(int offset, Command *cmd)
         offset++;
     }
     // value
+    // value to be set
     if (offset < cmd->length())
     {
         setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+        return true;
+    }
+    else if (iot == IO_D) // just set the pin to digital output
+    {
         return true;
     }
 

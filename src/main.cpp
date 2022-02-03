@@ -3,7 +3,7 @@
 #include <Command.h>
 #include <CommonI2CCommand.h>
 // adding support for stepper motor
-#include <Stepper.h>
+
 
 
 
@@ -16,6 +16,7 @@
 #define ADC_PIN_AREF A2
 #define ADC_PIN A3
 #define AREV_VOLTAGE 4.092000
+long loopCounter = 0;
 
 
 Command command = Command();
@@ -37,13 +38,13 @@ Command command = Command();
 
 
 
-
+bool busy = false;
 
 
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.04.61");
+CVersion Version("84-I2C-1.05.10");
 CUptime Uptime;
 CReset Reset(RESET_PIN_CONTROLLER);
 EnumMap EMAref(C_CALIBRATE, "AREF");
@@ -169,6 +170,7 @@ CAref ARef(ADC_PIN_AREF);
 // Gets called when the ATTiny receives an i2c request
 void requestEvent()
 {
+   busy = true;
    if(command.length() > 0)
    {
      //int index = 0;
@@ -188,7 +190,8 @@ void requestEvent()
    else
       I2CUtil::write(I2CConfig.getAddress());
 
-   command.reset(); 
+   command.reset();
+   busy = false;
   
 }
 
@@ -225,7 +228,7 @@ void setup()
   CommandManager.add(&PinIO);
   
   // set the analog reference to external
-  analogReference(EXTERNAL);
+  //analogReference(EXTERNAL);
 
   
 
@@ -240,7 +243,8 @@ void setup()
   //pinMode(PB2, OUTPUT);
   // digitalWrite(PB2, HIGH);
   //digitalWrite(A1, HIGH);
-  ARef.getAnalogAref(); // ARef value
+
+  //ARef.getAnalogAref(); // ARef value
     
     
 
@@ -259,6 +263,8 @@ void loop()
     // }
     
   // adding delays create i2c issues
+
+   //delay(10);
   
 }
  
