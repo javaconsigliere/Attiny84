@@ -1,11 +1,46 @@
 #include "CommonI2CCommand.h"
+
+class IOPostRunnable: public Runnable
+{
+    public:
+    IO_TYPE iot;
+    uint8_t pin;
+    int setValue;
+    int run()
+    {
+        switch(iot)
+        {
+            case IO_A:
+                analogWrite(pin, setValue);
+                break;
+            case IO_D: 
+                pinMode(pin, OUTPUT);
+                digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
+                
+
+                // if(setValue == -1)
+                //     pinMode(pin, OUTPUT);
+                // else
+                // {
+                //     if (setValue == 0)
+                //         PORTA &= ~_BV(pin);// low
+                //     else
+                //         PORTA |= _BV(pin);//high
+                // }
+                break;
+            case IO_P:
+                break;
+        }
+        return OK;
+    }
+};
+IOPostRunnable PostRunnable;
 // IO
 EnumMap EMIO(C_IO, "IO");
 CPinIO::CPinIO():CommandProcessor(&EMIO)
 {
 
 }
-/*
 int CPinIO::run()
 {
     int val = 0;
@@ -31,13 +66,16 @@ int CPinIO::run()
             switch(iot)
             {
                 case IO_A:
-                    analogWrite(pin, setValue);
+                    //analogWrite(pin, setValue);
                     //val = analogRead(pin);
+                    iotchar = 'A';
                     break;
-                case IO_D:
-
-                    pinMode(pin, OUTPUT);
-                    digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
+                case IO_D: 
+                    //pinMode(pin, OUTPUT);
+                    val = setValue == 0 ? LOW : HIGH;
+                    //digitalWrite(pin,  val);
+                    
+                    iotchar = 'D';
 
                     // if(setValue == -1)
                     //     pinMode(pin, OUTPUT);
@@ -55,10 +93,26 @@ int CPinIO::run()
                 case IO_P:
                     break;
             }
-            // I2CUtil::write(OK);
-            // I2CUtil::write((uint8_t)':');
-            // I2CUtil::write((long)setValue);
-            // break;
+            if (PendingRunnable == NULL)
+            {
+                PostRunnable.iot = iot;
+                PostRunnable.pin = pin;
+                PostRunnable.setValue = setValue;
+                PendingRunnable = &PostRunnable;
+                I2CUtil::write(OK);
+                I2CUtil::write((uint8_t)':');
+                I2CUtil::write((uint8_t)iotchar);
+                I2CUtil::write((uint8_t)':');
+                I2CUtil::write((uint8_t)pin);
+                I2CUtil::write((uint8_t)':');
+                I2CUtil::write((long)val);
+                return OK;
+            }
+            else
+            {
+                return CONFLICT;
+            }
+            break;
             
         case G:
             switch(iot)
@@ -88,82 +142,109 @@ int CPinIO::run()
     
 
     return OK;
-}*/
+}
 
-
-int CPinIO::run()
+void CPinIO::postRun()
 {
-    int val = 0;
-    char iotchar;
+    switch(iot)
+    {
+        case IO_A:
+            analogWrite(pin, setValue);
+            break;
+        case IO_D: 
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
+            
+
+            // if(setValue == -1)
+            //     pinMode(pin, OUTPUT);
+            // else
+            // {
+            //     if (setValue == 0)
+            //         PORTA &= ~_BV(pin);// low
+            //     else
+            //         PORTA |= _BV(pin);//high
+            // }
+            break;
+        case IO_P:
+            break;
+    }
+}
+
+
+// int CPinIO::run()
+// {
+//     int val = 0;
+//     char iotchar;
   
     
     
     
-        if(action == S)
-        {
-            if(iot == IO_A)
-            {
+//         if(action == S)
+//         {
+//             if(iot == IO_A)
+//             {
             
-                    analogWrite(pin, setValue);
-                    //val = analogRead(pin);
-                    iotchar = 'A';
-            }
-            else if (iot == IO_D)
-            {
+//                     analogWrite(pin, setValue);
+//                     //val = analogRead(pin);
+//                     iotchar = 'A';
+//             }
+//             else if (iot == IO_D)
+//             {
              
 
-                    pinMode(pin, OUTPUT);
-                    digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
+//                     pinMode(pin, OUTPUT);
+//                     digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
 
-                    // if(setValue == -1)
-                    //     pinMode(pin, OUTPUT);
-                    // else
-                    // {
+//                     // if(setValue == -1)
+//                     //     pinMode(pin, OUTPUT);
+//                     // else
+//                     // {
                         
-                    //     if (setValue == 0)
-                    //         PORTA &= ~_BV(pin);// low
-                    //     else
-                    //         PORTA |= _BV(pin);//high
-                    // }
+//                     //     if (setValue == 0)
+//                     //         PORTA &= ~_BV(pin);// low
+//                     //     else
+//                     //         PORTA |= _BV(pin);//high
+//                     // }
 
-                    //val = digitalRead(pin);
-                    iotchar = 'D';
-            }
-            val = setValue;
+//                     //val = digitalRead(pin);
+//                     iotchar = 'D';
+//             }
+//             val = setValue;
                
-        }
-        else if (action == G)
-        {
+//         }
+//         else if (action == G)
+//         {
             
         
-            switch(iot)
-            {
-                case IO_A:
-                    val = analogRead(pin);
-                    iotchar = 'A';
-                    break;
-                case IO_D:
-                    val = digitalRead(pin);
-                    iotchar = 'D';
-                    break;
-                case IO_P:
-                    break;
-            }
-        }
-        I2CUtil::write(OK);
-        I2CUtil::write((uint8_t)':');
-        I2CUtil::write((uint8_t)iotchar);
-        I2CUtil::write((uint8_t)':');
-        I2CUtil::write((uint8_t)pin);
-        I2CUtil::write((uint8_t)':');
-        I2CUtil::write((long)val);
+//             switch(iot)
+//             {
+//                 case IO_A:
+//                     val = analogRead(pin);
+//                     iotchar = 'A';
+//                     break;
+//                 case IO_D:
+//                     val = digitalRead(pin);
+//                     iotchar = 'D';
+//                     break;
+//                 case IO_P:
+//                     break;
+//             }
+//         }
+//         I2CUtil::write(OK);
+//         I2CUtil::write((uint8_t)':');
+//         I2CUtil::write((uint8_t)iotchar);
+//         I2CUtil::write((uint8_t)':');
+//         I2CUtil::write((uint8_t)pin);
+//         I2CUtil::write((uint8_t)':');
+//         I2CUtil::write((long)val);
     
    
     
     
 
-    return OK;
-}
+//     return OK;
+// }
 
 boolean CPinIO::parseParameters(int offset, Command *cmd)
 {

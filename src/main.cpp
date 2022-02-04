@@ -44,7 +44,7 @@ bool busy = false;
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.05.15");
+CVersion Version("84-I2C-1.05.26");
 CUptime Uptime;
 CReset Reset(RESET_PIN_CONTROLLER);
 EnumMap EMAref(C_CALIBRATE, "AREF");
@@ -170,7 +170,7 @@ CAref ARef(ADC_PIN_AREF);
 // Gets called when the ATTiny receives an i2c request
 void requestEvent()
 {
-   busy = true;
+
    if(command.length() > 0)
    {
      //int index = 0;
@@ -178,7 +178,13 @@ void requestEvent()
      CommandProcessor *rp = CommandManager.parse(&command);
      if(rp != NULL)
      {
-      rp->run();
+       int status = rp->run();
+       if (status != OK)
+       {
+          I2CUtil::write(status);
+          I2CUtil::write((uint8_t)':');
+          I2CUtil::write(-1L);
+       }
      }
     else
     {
@@ -201,6 +207,7 @@ void receiveEvent(int howMany)
     {
         return;// Sanity-check
     }
+    busy = true;
     I2CMessageCounter.inc();
   
     int counter = 0;
@@ -216,6 +223,7 @@ void receiveEvent(int howMany)
 void setup()
 {   
   // register the I2C commands
+  
   CommandManager.add(&I2CMessageCounter);
   CommandManager.add(&PingCounter);
   CommandManager.add(&Version);
@@ -224,11 +232,12 @@ void setup()
   CommandManager.add(&CPUSpeed);
   CommandManager.add(&Reset);
   CommandManager.add(&I2CAddress);
-  // CommandManager.add(&Echo);
   CommandManager.add(&PinIO);
+  // CommandManager.add(&Echo);
+  
   
   // set the analog reference to external
-  analogReference(EXTERNAL);
+  //analogReference(EXTERNAL);
 
   
 
@@ -264,7 +273,13 @@ void loop()
     
   // adding delays create i2c issues
 
-  delay(1);
+  if(PendingRunnable != NULL)
+  {
+    PendingRunnable->run();
+    PendingRunnable = NULL;
+  }
+  else
+    delay(1);
   loopCounter++;
   
 }

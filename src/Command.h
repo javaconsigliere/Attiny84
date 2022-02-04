@@ -61,6 +61,7 @@ class CommandProcessor : public Runnable
   public:
     CommandProcessor(EnumMap *c);
     virtual boolean parseParameters(int offset, Command *cmd);
+    
     // virtual int run() = 0;
     EnumMap *getCommand();
     void setAction(ACTION);

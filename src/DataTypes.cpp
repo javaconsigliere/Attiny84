@@ -73,3 +73,4 @@ EnumMap EMEnum(ENUM,"E");
 EnumMap EMAnalog(IO_A, "A");
 EnumMap EMDigital(IO_D, "D");
 EnumMap EMPWM(IO_P, "P");
+Runnable *PendingRunnable;

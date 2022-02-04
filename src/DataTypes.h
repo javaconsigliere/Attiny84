@@ -51,6 +51,8 @@ enum HTTP_STATUS
   UNAUTORIZED=401,
   FORBIDDEN=403,
   NOT_FOUND=404,
+  CONFLICT=409,
+  PRECONDITION_FAILED=412,
 
 };
 
@@ -86,5 +88,7 @@ extern EnumMap EMEnum;
 extern EnumMap EMAnalog;
 extern EnumMap EMDigital;
 extern EnumMap EMPWM;
+
+extern Runnable *PendingRunnable;
 
 #endif

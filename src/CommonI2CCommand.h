@@ -13,6 +13,7 @@ class CPinIO : public CommandProcessor
   public:
     CPinIO();
     int run();
+    void postRun();
     boolean parseParameters(int offset, Command *cmd);
 
 };
