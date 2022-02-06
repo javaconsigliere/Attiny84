@@ -69,6 +69,7 @@ int CPinIO::run()
                     //analogWrite(pin, setValue);
                     //val = analogRead(pin);
                     iotchar = 'A';
+                    val = setValue;
                     break;
                 case IO_D: 
                     //pinMode(pin, OUTPUT);
@@ -97,7 +98,7 @@ int CPinIO::run()
             {
                 PostRunnable.iot = iot;
                 PostRunnable.pin = pin;
-                PostRunnable.setValue = setValue;
+                PostRunnable.setValue = val;
                 PendingRunnable = &PostRunnable;
                 I2CUtil::write(OK);
                 I2CUtil::write((uint8_t)':');
@@ -149,6 +150,7 @@ void CPinIO::postRun()
     switch(iot)
     {
         case IO_A:
+            pinMode(pin, OUTPUT);
             analogWrite(pin, setValue);
             break;
         case IO_D: 

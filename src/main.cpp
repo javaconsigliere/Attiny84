@@ -44,7 +44,7 @@ bool busy = false;
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.05.26");
+CVersion Version("84-I2C-1.05.35");
 CUptime Uptime;
 CReset Reset(RESET_PIN_CONTROLLER);
 EnumMap EMAref(C_CALIBRATE, "AREF");
@@ -237,7 +237,7 @@ void setup()
   
   
   // set the analog reference to external
-  //analogReference(EXTERNAL);
+  analogReference(EXTERNAL);
 
   
 
