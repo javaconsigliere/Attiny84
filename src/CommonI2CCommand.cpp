@@ -359,13 +359,18 @@ int CUptime::run()
 
 // VERSION
 EnumMap EMVersion(C_VERSION, "VERSION");
-CVersion::CVersion(const char * v):CommandProcessor(&EMVersion)
+CVersion::CVersion(const char *m, const char * v):CommandProcessor(&EMVersion)
 {
+    model = m;
     version = v;
+    length = strlen(model) + strlen(version) + 1;
 }
 int CVersion::run()
 {
-    I2CUtil::write(version);
+    I2CUtil::write((uint8_t)length);
+    I2CUtil::write(false, model);
+    I2CUtil::write((uint8_t)':');
+    I2CUtil::write(false, version);
     return OK;
 }
 // VERSION END

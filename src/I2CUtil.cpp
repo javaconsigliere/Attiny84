@@ -61,10 +61,17 @@ void I2CUtil::write(uint8_t b)
 
 void I2CUtil::write(const char * str)
 {
+  I2CUtil::write(true, str);
+  
+}
+
+void I2CUtil::write(bool writeLength, const char * str)
+{
   int len = strlen(str);
   if (len > 15)
     len = 15;
-  I2CUtil::write((uint8_t)len);
+  if(writeLength)  
+    I2CUtil::write((uint8_t)len);
  
   for(int i = 0 ; i < len ; i++)
   {

@@ -39,12 +39,16 @@ Command command = Command();
 
 
 bool busy = false;
-
+#if defined (__AVR_ATtiny84__)
+#define  DEVICE_MODEL "84-I2C"
+#elif defined (__AVR_ATtiny85__)   
+#define  DEVICE_MODEL "85-I2C"  
+#endif
 
 
 //////////////////////////////////////////////////////////////////////////////
 
-CVersion Version("84-I2C-1.05.35");
+CVersion Version(DEVICE_MODEL,"1.05.37");
 CUptime Uptime;
 CReset Reset(RESET_PIN_CONTROLLER);
 EnumMap EMAref(C_CALIBRATE, "AREF");
@@ -237,7 +241,7 @@ void setup()
   
   
   // set the analog reference to external
-  analogReference(EXTERNAL);
+  //analogReference(EXTERNAL);
 
   
 
@@ -279,7 +283,11 @@ void loop()
     PendingRunnable = NULL;
   }
   else
+  {
+  #if defined (__AVR_ATtiny84__) 
     delay(1);
+  #endif
+  }
   loopCounter++;
   
 }

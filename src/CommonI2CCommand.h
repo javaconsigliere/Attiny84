@@ -32,11 +32,13 @@ class CCPUSpeed:public CommandProcessor
 class CVersion:public CommandProcessor
 {
   private:
+   const char *model;
    const char * version;
+   int length;
   public:
     
 
-    CVersion(const char * v);
+    CVersion(const char *m, const char * v);
     int run();
 };
 

@@ -16,6 +16,7 @@ class I2CUtil
    static void write(long l);
    static void write(float f);
    static void write(const char * str);
+   static void write(bool writeLength, const char * str);
 
    static void writeReverse(uint8_t *b, int len);
 };
