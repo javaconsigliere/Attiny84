@@ -66,6 +66,8 @@ void Command::reset()
 
 
 
+
+
 EnumMap *CommandProcessor::getCommand()
 {
     return command;
@@ -83,6 +85,11 @@ ACTION CommandProcessor::getAction()
 CommandProcessor::CommandProcessor(EnumMap *em)
 {
     command = em;
+}
+
+void CommandProcessor::postRun()
+{
+    
 }
 
 boolean CommandProcessor::parseParameters(int offset, Command *command)

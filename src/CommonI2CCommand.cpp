@@ -1,40 +1,7 @@
 #include "CommonI2CCommand.h"
 
-class IOPostRunnable: public Runnable
-{
-    public:
-    IO_TYPE iot;
-    uint8_t pin;
-    int setValue;
-    int run()
-    {
-        switch(iot)
-        {
-            case IO_A:
-                analogWrite(pin, setValue);
-                break;
-            case IO_D: 
-                pinMode(pin, OUTPUT);
-                digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
-                
 
-                // if(setValue == -1)
-                //     pinMode(pin, OUTPUT);
-                // else
-                // {
-                //     if (setValue == 0)
-                //         PORTA &= ~_BV(pin);// low
-                //     else
-                //         PORTA |= _BV(pin);//high
-                // }
-                break;
-            case IO_P:
-                break;
-        }
-        return OK;
-    }
-};
-IOPostRunnable PostRunnable;
+CommandProcessor *PostRun = NULL;
 // IO
 EnumMap EMIO(C_IO, "IO");
 CPinIO::CPinIO():CommandProcessor(&EMIO)
@@ -94,12 +61,13 @@ int CPinIO::run()
                 case IO_P:
                     break;
             }
-            if (PendingRunnable == NULL)
+            if (PostRun == NULL)
             {
-                PostRunnable.iot = iot;
-                PostRunnable.pin = pin;
-                PostRunnable.setValue = val;
-                PendingRunnable = &PostRunnable;
+                // PostRunnable.iot = iot;
+                // PostRunnable.pin = pin;
+                // PostRunnable.setValue = val;
+                // PendingRunnable = &PostRunnable;
+                
                 I2CUtil::write(OK);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((uint8_t)iotchar);
@@ -107,6 +75,7 @@ int CPinIO::run()
                 I2CUtil::write((uint8_t)pin);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((long)val);
+                PostRun = this;
                 return OK;
             }
             else

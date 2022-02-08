@@ -98,4 +98,5 @@ extern Counter PingCounter;
 extern CI2CAddress I2CAddress;
 extern CCPUSpeed CPUSpeed;
 extern CPinIO PinIO;
+extern CommandProcessor *PostRun;
 #endif

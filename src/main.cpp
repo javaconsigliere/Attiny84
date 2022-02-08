@@ -11,15 +11,26 @@
 // #error "Sketch was written for clockwise pin mapping!"
 // #endif
 
-#define RESET_PIN_CONTROLLER PB1
 
+#if defined (__AVR_ATtiny84__)
+#define DEVICE_MODEL "84-I2C"
+#define RESET_PIN_CONTROLLER PB0
+CReset Reset(RESET_PIN_CONTROLLER);
+#elif defined (__AVR_ATtiny85__)   
+#define  DEVICE_MODEL "85-I2C"  
+#endif
 #define ADC_PIN_AREF A2
 #define ADC_PIN A3
 #define AREV_VOLTAGE 4.092000
+
+// Number of time the loop function is called
 long loopCounter = 0;
-
-
+// Command object to store incoming i2c request or reads
 Command command = Command();
+
+EnumMap EMAref(C_CALIBRATE, "AREF");
+
+EnumMap EMEcho(C_ECHO, "ECHO");
 
 
 // EnumMap EMUsablePins[] =
@@ -30,110 +41,10 @@ Command command = Command();
 //   EnumMap(A7, "A7"),
 //   EnumMap(PB0, "PB0"),
 //   EnumMap(PB2, "PB2"),
- 
 // };
 
 
 
-
-
-
-bool busy = false;
-#if defined (__AVR_ATtiny84__)
-#define  DEVICE_MODEL "84-I2C"
-#elif defined (__AVR_ATtiny85__)   
-#define  DEVICE_MODEL "85-I2C"  
-#endif
-
-
-//////////////////////////////////////////////////////////////////////////////
-
-CVersion Version(DEVICE_MODEL,"1.05.37");
-CUptime Uptime;
-CReset Reset(RESET_PIN_CONTROLLER);
-EnumMap EMAref(C_CALIBRATE, "AREF");
-
-EnumMap EMEcho(C_ECHO, "ECHO");
-//////////////////////////////////////////////////////////////////////////////
-
-
-
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-
-
-//////////////////////////////////////////////////////////////////////////////
-// echo the received value int, long or byte
-// class CPEcho:public CommandProcessor
-// {
-//   private:
-//     long value;
-//     int length;
-//     EnumMap *current;
-//   public:
-//     CPEcho():CommandProcessor(&EMEcho)
-//     {
-
-//     }
-//     boolean parseParameters(int offset, Command *cmd)
-//     {
-//       //ECHO:S:[I,L]:value
-//       value = 0;
-//       length = 0;
-//       current = NULL;
-//       if(getAction() == S && offset < cmd->length())
-//       {
-        
-//         char * tok = (char *)cmd->getCommand();
-//         current = EnumMap::match(tok + offset, &EMInt, &EMLong, NULL);
-//         if(current != NULL)
-//         {
-//           offset+=2;
-//           switch(current->map())
-//           {
-//             case INT:
-//               value = BytesToPrimitive::toInt(cmd->getCommand() + offset);
-//               length = 2;
-//               break;
-//             case LONG:
-//               value = BytesToPrimitive::toLong(cmd->getCommand() + offset);
-//               length = 4;
-//               break;
-//           }
-//         }
-//       }
-//       return (length!=0);
-//     }
-
-//     int run()
-//     {
-//       // format OK:[I,L]:value
-//       I2CUtil::write(OK);
-//       I2CUtil::write((uint8_t)':');
-      
-//       I2CUtil::write((uint8_t) current->name()[0]);
-//       I2CUtil::write((uint8_t)':');
-      
-//       switch(current->map())
-//       { 
-//         case INT:
-//           I2CUtil::write((int) value);
-//           break;
-//         case LONG:
-//           I2CUtil::write(value);
-//           break;
-//       }
-//       return OK;
-//     }
-// };
-// CPEcho Echo;
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-
-//////////////////////////////////////////////////////////////////////////////
 
 class CAref:public CommandProcessor
 {
@@ -163,7 +74,6 @@ class CAref:public CommandProcessor
       return aRefValue;
     }
 };
-CAref ARef(ADC_PIN_AREF);
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -171,7 +81,7 @@ CAref ARef(ADC_PIN_AREF);
 
 
 
-// Gets called when the ATTiny receives an i2c request
+// Gets called when the ATTiny receives an i2c request MASTER--> READ FROM I2C SLAVE DEVICE
 void requestEvent()
 {
 
@@ -201,17 +111,17 @@ void requestEvent()
       I2CUtil::write(I2CConfig.getAddress());
 
    command.reset();
-   busy = false;
+
   
 }
-
+// Gets called when the ATTiny receives an i2c command or MASTER --> WRITE TO I2C SLAVE DEVICE
 void receiveEvent(int howMany)
 {
     if (howMany < 1)
     {
         return;// Sanity-check
     }
-    busy = true;
+    
     I2CMessageCounter.inc();
   
     int counter = 0;
@@ -223,7 +133,11 @@ void receiveEvent(int howMany)
     command.setLength(counter);
 }
 
- 
+
+
+CAref ARef(ADC_PIN_AREF);
+CVersion Version(DEVICE_MODEL,"1.05.51"); 
+CUptime Uptime;
 void setup()
 {   
   // register the I2C commands
@@ -232,16 +146,20 @@ void setup()
   CommandManager.add(&PingCounter);
   CommandManager.add(&Version);
   CommandManager.add(&Uptime);
-  CommandManager.add(&ARef);
   CommandManager.add(&CPUSpeed);
-  CommandManager.add(&Reset);
   CommandManager.add(&I2CAddress);
   CommandManager.add(&PinIO);
   // CommandManager.add(&Echo);
   
   
   // set the analog reference to external
-  //analogReference(EXTERNAL);
+  
+
+#if defined (__AVR_ATtiny84__) 
+    //analogReference(EXTERNAL);
+    CommandManager.add(&Reset);
+    CommandManager.add(&ARef);
+#endif
 
   
 
@@ -277,10 +195,18 @@ void loop()
     
   // adding delays create i2c issues
 
-  if(PendingRunnable != NULL)
+  if(PostRun != NULL || PendingRunnable != NULL)
   {
-    PendingRunnable->run();
-    PendingRunnable = NULL;
+    if(PostRun != NULL)
+    {
+      PostRun->postRun();
+      PostRun = NULL;
+    }
+    if(PendingRunnable != NULL)
+    {
+      PendingRunnable->run();
+      PendingRunnable = NULL;
+    }
   }
   else
   {
