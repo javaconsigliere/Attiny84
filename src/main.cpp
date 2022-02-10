@@ -136,7 +136,7 @@ void receiveEvent(int howMany)
 
 
 CAref ARef(ADC_PIN_AREF);
-CVersion Version(DEVICE_MODEL,"1.05.51"); 
+CVersion Version(DEVICE_MODEL,"1.05.53"); 
 CUptime Uptime;
 void setup()
 {   
@@ -194,26 +194,24 @@ void loop()
     // }
     
   // adding delays create i2c issues
-
+  #if defined (__AVR_ATtiny84__) 
+    delay(1);
+  #endif
   if(PostRun != NULL || PendingRunnable != NULL)
   {
-    if(PostRun != NULL)
-    {
-      PostRun->postRun();
-      PostRun = NULL;
-    }
     if(PendingRunnable != NULL)
     {
       PendingRunnable->run();
       PendingRunnable = NULL;
     }
+    if(PostRun != NULL)
+    {
+      PostRun->postRun();
+      PostRun = NULL;
+    }
+    
   }
-  else
-  {
-  #if defined (__AVR_ATtiny84__) 
-    delay(1);
-  #endif
-  }
+  
   loopCounter++;
   
 }

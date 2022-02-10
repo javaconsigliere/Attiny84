@@ -67,7 +67,7 @@ int CPinIO::run()
                 // PostRunnable.pin = pin;
                 // PostRunnable.setValue = val;
                 // PendingRunnable = &PostRunnable;
-                
+                PostRun = this;
                 I2CUtil::write(OK);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((uint8_t)iotchar);
@@ -75,7 +75,7 @@ int CPinIO::run()
                 I2CUtil::write((uint8_t)pin);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((long)val);
-                PostRun = this;
+                
                 return OK;
             }
             else
