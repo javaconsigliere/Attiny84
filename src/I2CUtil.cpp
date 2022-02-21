@@ -2,9 +2,10 @@
 
 #include <EEPROM.h>
 
+
 #define CHECK_ARRAY_SIZE 5
 #define I2C_DEFAULT_SLAVE_ADDRESS 0x4
-
+Command command = Command();
 I2C_Config::I2C_Config()
 {
    
@@ -150,3 +151,61 @@ I2C_Config I2CConfig = I2C_Config();
 // {
 //    wireWrite((byte*) &val, 2);
 // }
+
+void I2CUtil::request(int howMany)
+{
+  if (howMany < 1)
+    {
+        return;// Sanity-check
+    }
+    
+    I2CMessageCounter.inc();
+  
+    int counter = 0;
+    uint8_t *c = command.getCommand();
+    while(Wire.available() && counter < command.getSize())
+    {
+      c[counter++] = Wire.read();
+    }
+    command.setLength(counter);
+}
+
+void I2CUtil::response()
+{
+    if(command.length() > 0)
+   {
+     //int index = 0;
+     
+     CommandProcessor *rp = CommandManager.parse(&command);
+     if(rp != NULL)
+     {
+       int status = rp->run();
+       if (status != OK)
+       {
+          I2CUtil::write(status);
+          I2CUtil::write((uint8_t)':');
+          I2CUtil::write(-1L);
+       }
+     }
+    else
+    {
+      I2CUtil::write(NOT_FOUND);
+      I2CUtil::write((uint8_t)':');
+      I2CUtil::write(-1L);
+    }
+   }
+   else
+      I2CUtil::write(I2CConfig.getAddress());
+
+   command.reset();
+}
+
+void I2CUtil::setup()
+{
+  // set the slave I2C address by reading it from the EEPROM
+  Wire.begin(I2CConfig.getAddress());
+  // register function for incoming request from MASTER
+  Wire.onReceive(I2CUtil::request); // incoming 
+  // register function for SLAVE response back to MASTER
+  Wire.onRequest(I2CUtil::response);
+}

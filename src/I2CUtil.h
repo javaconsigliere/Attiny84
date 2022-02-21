@@ -3,12 +3,15 @@
 
 #include <Wire.h>
 #include <Arduino.h>
+#include<Command.h>
+#include<CommonI2CCommand.h>
 
 
 class I2CUtil
 {
 
   private:
+  
 
   public:
    static void write(uint8_t b);
@@ -19,6 +22,9 @@ class I2CUtil
    static void write(bool writeLength, const char * str);
 
    static void writeReverse(uint8_t *b, int len);
+   static void request(int);
+   static void response();
+   static void setup();
 };
 
 

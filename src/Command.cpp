@@ -1,4 +1,4 @@
-#include "Command.h"
+#include <Command.h>
 
 
 
@@ -87,10 +87,6 @@ CommandProcessor::CommandProcessor(EnumMap *em)
     command = em;
 }
 
-void CommandProcessor::postRun()
-{
-    
-}
 
 boolean CommandProcessor::parseParameters(int offset, Command *command)
 {

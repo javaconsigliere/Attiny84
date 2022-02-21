@@ -1,13 +1,51 @@
-#include "CommonI2CCommand.h"
+#include <CommonI2CCommand.h>
 
 
-CommandProcessor *PostRun = NULL;
+class CIOPostRun:public Runnable
+{
+    public:
+    int run()
+    {
+        switch(PinIO.getIOT())
+        {
+        case IO_A:
+            pinMode(PinIO.getPin(), OUTPUT);
+            analogWrite(PinIO.getPin(), PinIO.getValue());
+            break;
+        case IO_D: 
+            pinMode(PinIO.getPin(), OUTPUT);
+            digitalWrite(PinIO.getPin(),  PinIO.getValue() == 0 ? LOW : HIGH);
+            
+
+            // if(setValue == -1)
+            //     pinMode(pin, OUTPUT);
+            // else
+            // {
+            //     if (setValue == 0)
+            //         PORTA &= ~_BV(pin);// low
+            //     else
+            //         PORTA |= _BV(pin);//high
+            // }
+            break;
+        case IO_P:
+        
+            break;
+        }
+
+        return OK;
+    }
+};
+
+CIOPostRun IOPostRun;
+
 // IO
 EnumMap EMIO(C_IO, "IO");
 CPinIO::CPinIO():CommandProcessor(&EMIO)
 {
 
 }
+
+
 int CPinIO::run()
 {
     int val = 0;
@@ -61,13 +99,13 @@ int CPinIO::run()
                 case IO_P:
                     break;
             }
-            if (PostRun == NULL)
+            if (PendingRunnable == NULL)
             {
                 // PostRunnable.iot = iot;
                 // PostRunnable.pin = pin;
                 // PostRunnable.setValue = val;
                 // PendingRunnable = &PostRunnable;
-                PostRun = this;
+                PendingRunnable = &IOPostRun;
                 I2CUtil::write(OK);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((uint8_t)iotchar);
@@ -114,108 +152,24 @@ int CPinIO::run()
     return OK;
 }
 
-void CPinIO::postRun()
+IO_TYPE CPinIO::getIOT()
 {
-    switch(iot)
-    {
-        case IO_A:
-            pinMode(pin, OUTPUT);
-            analogWrite(pin, setValue);
-            break;
-        case IO_D: 
-            pinMode(pin, OUTPUT);
-            digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
-            
-
-            // if(setValue == -1)
-            //     pinMode(pin, OUTPUT);
-            // else
-            // {
-            //     if (setValue == 0)
-            //         PORTA &= ~_BV(pin);// low
-            //     else
-            //         PORTA |= _BV(pin);//high
-            // }
-            break;
-        case IO_P:
-            break;
-    }
+    return iot;
+}
+uint8_t CPinIO::getPin()
+{
+    return pin;
+}
+int CPinIO::getValue()
+{
+    return setValue;
 }
 
 
-// int CPinIO::run()
-// {
-//     int val = 0;
-//     char iotchar;
-  
-    
-    
-    
-//         if(action == S)
-//         {
-//             if(iot == IO_A)
-//             {
-            
-//                     analogWrite(pin, setValue);
-//                     //val = analogRead(pin);
-//                     iotchar = 'A';
-//             }
-//             else if (iot == IO_D)
-//             {
-             
 
-//                     pinMode(pin, OUTPUT);
-//                     digitalWrite(pin,  setValue == 0 ? LOW : HIGH);
 
-//                     // if(setValue == -1)
-//                     //     pinMode(pin, OUTPUT);
-//                     // else
-//                     // {
-                        
-//                     //     if (setValue == 0)
-//                     //         PORTA &= ~_BV(pin);// low
-//                     //     else
-//                     //         PORTA |= _BV(pin);//high
-//                     // }
 
-//                     //val = digitalRead(pin);
-//                     iotchar = 'D';
-//             }
-//             val = setValue;
-               
-//         }
-//         else if (action == G)
-//         {
-            
-        
-//             switch(iot)
-//             {
-//                 case IO_A:
-//                     val = analogRead(pin);
-//                     iotchar = 'A';
-//                     break;
-//                 case IO_D:
-//                     val = digitalRead(pin);
-//                     iotchar = 'D';
-//                     break;
-//                 case IO_P:
-//                     break;
-//             }
-//         }
-//         I2CUtil::write(OK);
-//         I2CUtil::write((uint8_t)':');
-//         I2CUtil::write((uint8_t)iotchar);
-//         I2CUtil::write((uint8_t)':');
-//         I2CUtil::write((uint8_t)pin);
-//         I2CUtil::write((uint8_t)':');
-//         I2CUtil::write((long)val);
-    
-   
-    
-    
 
-//     return OK;
-// }
 
 boolean CPinIO::parseParameters(int offset, Command *cmd)
 {
@@ -403,8 +357,31 @@ int CI2CAddress::run()
 CI2CAddress I2CAddress;
 // I2C-ADDRESS end
 
+EnumMap EMAref(C_CALIBRATE, "AREF");
+CAref::CAref(uint8_t pin):CommandProcessor(&EMAref)
+{
+      referencePin = pin;
+}
 
 
+
+ int CAref::run()
+ {
+      I2CUtil::write(OK);
+      I2CUtil::write((uint8_t)':');
+      I2CUtil::write((long)getAnalogAref());
+      return OK;
+}
+
+int CAref::getAnalogAref()
+{
+    aRefValue = analogRead(referencePin);
+    return aRefValue;
+}
+int CAref::getAref()
+{
+    return aRefValue;
+}
 
 
 Counter::Counter(EnumMap *c, boolean cType) : CommandProcessor(c)

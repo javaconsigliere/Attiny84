@@ -13,8 +13,10 @@ class CPinIO : public CommandProcessor
   public:
     CPinIO();
     int run();
-    void postRun();
     boolean parseParameters(int offset, Command *cmd);
+    IO_TYPE getIOT();
+    uint8_t getPin();
+    int getValue();
 
 };
 
@@ -88,6 +90,20 @@ class CReset : public CommandProcessor
     int run();
 };
 
+class CAref:public CommandProcessor
+{
+  private:
+    int aRefValue = 0;
+    uint8_t referencePin;
+  public:
+    CAref(uint8_t pin);
+   
+    int run();
+    int getAnalogAref();
+   
+    int getAref();
+    
+};
 
 
 
@@ -98,5 +114,7 @@ extern Counter PingCounter;
 extern CI2CAddress I2CAddress;
 extern CCPUSpeed CPUSpeed;
 extern CPinIO PinIO;
-extern CommandProcessor *PostRun;
+
+// This is used to execute a command inside the main loop function
+// if PostRun is not NULL
 #endif
