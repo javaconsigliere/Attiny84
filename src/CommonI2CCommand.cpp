@@ -27,9 +27,7 @@ class CIOPostRun:public Runnable
             //         PORTA |= _BV(pin);//high
             // }
             break;
-        case IO_P:
         
-            break;
         }
 
         return OK;
@@ -53,19 +51,6 @@ int CPinIO::run()
    
     switch(getAction())
     {
-        // case G:
-        //     switch(iot)
-        //     {
-        //         case IO_A:
-        //             val = analogRead(pin);
-        //             break;
-        //         case IO_D:
-        //             val = digitalRead(pin);
-        //             break;
-        //         case IO_P:
-        //             break;
-        //     }
-        //     break;
         case S:
         case U:
             switch(iot)
@@ -75,6 +60,11 @@ int CPinIO::run()
                     //val = analogRead(pin);
                     iotchar = 'A';
                     val = setValue;
+                    if (setValue == -1)
+                    {
+                         pinMode(PinIO.getPin(), INPUT);
+                    }
+                    
                     break;
                 case IO_D: 
                     //pinMode(pin, OUTPUT);
@@ -82,6 +72,10 @@ int CPinIO::run()
                     //digitalWrite(pin,  val);
                     
                     iotchar = 'D';
+                    if (setValue == -1)
+                    {
+                         pinMode(PinIO.getPin(), INPUT);
+                    }
 
                     // if(setValue == -1)
                     //     pinMode(pin, OUTPUT);
@@ -96,8 +90,7 @@ int CPinIO::run()
 
                     //val = digitalRead(pin);
                     break;
-                case IO_P:
-                    break;
+                
             }
             if (PendingRunnable == NULL)
             {
@@ -105,7 +98,8 @@ int CPinIO::run()
                 // PostRunnable.pin = pin;
                 // PostRunnable.setValue = val;
                 // PendingRunnable = &PostRunnable;
-                PendingRunnable = &IOPostRun;
+                if(setValue != -1)
+                    PendingRunnable = &IOPostRun;
                 I2CUtil::write(OK);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((uint8_t)iotchar);
@@ -113,15 +107,38 @@ int CPinIO::run()
                 I2CUtil::write((uint8_t)pin);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((long)val);
-                
-                return OK;
             }
             else
             {
                 return CONFLICT;
             }
             break;
-            
+        case P:
+            switch (setValue)
+            {
+            case 'P': // pull up
+                 pinMode(PinIO.getPin(), INPUT_PULLUP);
+                break;
+            case 'I':
+                pinMode(PinIO.getPin(), INPUT);
+                break;
+            case 'O':
+                pinMode(PinIO.getPin(), OUTPUT);
+                break;
+
+            default:
+                return BAD_REQUEST;
+                
+            }
+            iotchar = 'P';
+            I2CUtil::write(OK);
+            I2CUtil::write((uint8_t)':');
+            I2CUtil::write((uint8_t)iotchar);
+            I2CUtil::write((uint8_t)':');
+            I2CUtil::write((uint8_t)pin);
+            I2CUtil::write((uint8_t)':');
+            I2CUtil::write((uint8_t)setValue);
+            break;    
         case G:
             switch(iot)
             {
@@ -133,8 +150,7 @@ int CPinIO::run()
                     val = digitalRead(pin);
                     iotchar = 'D';
                     break;
-                case IO_P:
-                    break;
+                
             }
             I2CUtil::write(OK);
             I2CUtil::write((uint8_t)':');
@@ -143,7 +159,7 @@ int CPinIO::run()
             I2CUtil::write((uint8_t)pin);
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((long)val);
-        break;
+            break;
         default:
             break;
     }
@@ -173,7 +189,8 @@ int CPinIO::getValue()
 
 boolean CPinIO::parseParameters(int offset, Command *cmd)
 {
-    // full command IO:[G,S,U,D]:[A,D,P]:pin:value
+    // full command IO:[G,S,U,D,P]:[A,D]:pin:[value]
+    // IO:P:[A,D]:pin:[I,O,P]
     setValue = -1;
     // parsing [A,D,P]
     if (offset < cmd->length())
@@ -231,13 +248,17 @@ boolean CPinIO::parseParameters(int offset, Command *cmd)
     // value to be set
     if (offset < cmd->length())
     {
-        setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+        if (getAction() != P)
+            setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+        else
+           setValue = cmd->getCommand()[offset];
+
         return true;
     }
-    else if (iot == IO_D) // just set the pin to digital output
-    {
-        return true;
-    }
+    // else if (getAction() == P) // just provision the pin
+    // {
+    //     return true;
+    // }
 
     
 

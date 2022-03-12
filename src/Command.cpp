@@ -165,6 +165,10 @@ CommandProcessor * CManager::parse(Command *command)
                         cProcessors[i]->setAction(G);
                         m++;
                         break;
+                        case 'P':
+                        cProcessors[i]->setAction(P);
+                        m++;
+                        break;
                         default:
                             return NULL;
                     }

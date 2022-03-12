@@ -32,14 +32,15 @@ enum ACTION
  G,
  S,
  U,
- D
+ D,
+ P
 };
 
 enum IO_TYPE
 {
   IO_A, // analog
   IO_D, // digital
-  IO_P, // PWM
+  //IO_P, // pwm
 };
 
 
