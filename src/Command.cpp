@@ -136,7 +136,7 @@ CommandProcessor * CManager::parse(Command *command)
         if (m == ctLength)
         {
             // we have a match
-            cProcessors[i]->setAction(G);
+            cProcessors[i]->setAction(A_G);
             if(m < command->length())
             {
                 // we need to parse action
@@ -150,23 +150,23 @@ CommandProcessor * CManager::parse(Command *command)
                     switch(command->getCommand()[m])
                     {
                         case 'S': 
-                        cProcessors[i]->setAction(S);
+                        cProcessors[i]->setAction(A_S);
                         m++;
                         break;
                         case 'U':
-                        cProcessors[i]->setAction(U);
+                        cProcessors[i]->setAction(A_U);
                         m++;
                         break;
                         case 'D':
-                        cProcessors[i]->setAction(D);
+                        cProcessors[i]->setAction(A_D);
                         m++;
                         break;
                         case 'G':
-                        cProcessors[i]->setAction(G);
+                        cProcessors[i]->setAction(A_G);
                         m++;
                         break;
                         case 'P':
-                        cProcessors[i]->setAction(P);
+                        cProcessors[i]->setAction(A_P);
                         m++;
                         break;
                         default:

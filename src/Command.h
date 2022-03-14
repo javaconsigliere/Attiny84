@@ -17,7 +17,7 @@ enum COMMAND
   C_VERSION,
   C_UPTIME,
   C_IO,
-  C_CALIBRATE,
+  C_ADC_REF,
   C_I2C_ADDRESS,
   C_ECHO
 };

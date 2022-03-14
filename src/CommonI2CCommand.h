@@ -93,15 +93,14 @@ class CReset : public CommandProcessor
 class CAref:public CommandProcessor
 {
   private:
-    int aRefValue = 0;
-    uint8_t referencePin;
+    int arefType = DEFAULT;
   public:
-    CAref(uint8_t pin);
+    CAref();
    
     int run();
-    int getAnalogAref();
-   
-    int getAref();
+    boolean parseParameters(int offset, Command *cmd);
+
+    int getArefType();
     
 };
 
@@ -114,6 +113,7 @@ extern Counter PingCounter;
 extern CI2CAddress I2CAddress;
 extern CCPUSpeed CPUSpeed;
 extern CPinIO PinIO;
+extern CAref ARef;
 
 // This is used to execute a command inside the main loop function
 // if PostRun is not NULL

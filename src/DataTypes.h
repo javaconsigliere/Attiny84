@@ -29,18 +29,17 @@ enum DATA_TYPE
 
 enum ACTION
 {
- G,
- S,
- U,
- D,
- P
+ A_G,
+ A_S,
+ A_U,
+ A_D,
+ A_P
 };
 
 enum IO_TYPE
 {
   IO_A, // analog
   IO_D, // digital
-  //IO_P, // pwm
 };
 
 

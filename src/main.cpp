@@ -14,10 +14,9 @@
 
 #if defined (__AVR_ATtiny84__)
 #define DEVICE_MODEL "84-I2C"
-#define RESET_PIN_CONTROLLER PB0
+#define RESET_PIN_CONTROLLER PB1
 // ATTINY84 specififc
-#define ADC_PIN_AREF A2
-CAref ARef(ADC_PIN_AREF);
+
 CReset Reset(RESET_PIN_CONTROLLER);
 
 #elif defined (__AVR_ATtiny85__)   
@@ -26,7 +25,7 @@ CReset Reset(RESET_PIN_CONTROLLER);
 
 
 
-#define ADC_PIN A3
+
 #define AREV_VOLTAGE 4.092000
 
 // Number of time the loop function is called
@@ -49,7 +48,7 @@ long loopCounter = 0;
 // };
 
 
-CVersion Version(DEVICE_MODEL,"1.05.64"); 
+CVersion Version(DEVICE_MODEL,"1.05.71"); 
 CUptime Uptime;
 void setup()
 {   
@@ -60,13 +59,14 @@ void setup()
   CommandManager.add(&Uptime);
   CommandManager.add(&CPUSpeed);
   CommandManager.add(&I2CAddress);
-  CommandManager.add(&PinIO);  
+  CommandManager.add(&PinIO);
+  CommandManager.add(&ARef);
 
 #if defined (__AVR_ATtiny84__) 
     // set the analog reference to external
     //analogReference(EXTERNAL);
     CommandManager.add(&Reset);
-    CommandManager.add(&ARef);
+    
 #endif
 
 
@@ -85,7 +85,7 @@ void loop()
 {
    
     
-  // adding delays create i2c issues
+  // adding delays due to i2c issues
   #if defined (__AVR_ATtiny84__) 
     delay(1);
   #endif

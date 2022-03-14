@@ -51,53 +51,24 @@ int CPinIO::run()
    
     switch(getAction())
     {
-        case S:
-        case U:
+        case A_S:
+        case A_U:// Set or update
             switch(iot)
             {
                 case IO_A:
-                    //analogWrite(pin, setValue);
-                    //val = analogRead(pin);
                     iotchar = 'A';
                     val = setValue;
-                    if (setValue == -1)
-                    {
-                         pinMode(PinIO.getPin(), INPUT);
-                    }
-                    
+                    //pinMode(pin, OUTPUT);
                     break;
                 case IO_D: 
-                    //pinMode(pin, OUTPUT);
-                    val = setValue == 0 ? LOW : HIGH;
-                    //digitalWrite(pin,  val);
-                    
                     iotchar = 'D';
-                    if (setValue == -1)
-                    {
-                         pinMode(PinIO.getPin(), INPUT);
-                    }
-
-                    // if(setValue == -1)
-                    //     pinMode(pin, OUTPUT);
-                    // else
-                    // {
-                        
-                    //     if (setValue == 0)
-                    //         PORTA &= ~_BV(pin);// low
-                    //     else
-                    //         PORTA |= _BV(pin);//high
-                    // }
-
-                    //val = digitalRead(pin);
+                    val = setValue == 0 ? LOW : HIGH;
+                    //pinMode(pin, OUTPUT);
                     break;
                 
             }
             if (PendingRunnable == NULL)
             {
-                // PostRunnable.iot = iot;
-                // PostRunnable.pin = pin;
-                // PostRunnable.setValue = val;
-                // PendingRunnable = &PostRunnable;
                 if(setValue != -1)
                     PendingRunnable = &IOPostRun;
                 I2CUtil::write(OK);
@@ -113,7 +84,7 @@ int CPinIO::run()
                 return CONFLICT;
             }
             break;
-        case P:
+        case A_P://provision the pin
             switch (setValue)
             {
             case 'P': // pull up
@@ -139,7 +110,7 @@ int CPinIO::run()
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((uint8_t)setValue);
             break;    
-        case G:
+        case A_G:
             switch(iot)
             {
                 case IO_A:
@@ -213,9 +184,6 @@ boolean CPinIO::parseParameters(int offset, Command *cmd)
             case 'D':
                 iot = IO_D;
                 break;
-            // case 'P':
-            //     iot = IO_P;
-            //     break;
             default:
                 return false;
         }
@@ -233,7 +201,7 @@ boolean CPinIO::parseParameters(int offset, Command *cmd)
         pin = cmd->getCommand() [offset++];
         //offset+=2;
         
-        if(getAction() == G)
+        if(getAction() == A_G)
         {
             return true;
         }
@@ -248,17 +216,13 @@ boolean CPinIO::parseParameters(int offset, Command *cmd)
     // value to be set
     if (offset < cmd->length())
     {
-        if (getAction() != P)
+        if (getAction() != A_P)
             setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
         else
-           setValue = cmd->getCommand()[offset];
+            setValue = cmd->getCommand()[offset];
 
         return true;
     }
-    // else if (getAction() == P) // just provision the pin
-    // {
-    //     return true;
-    // }
 
     
 
@@ -342,14 +306,14 @@ CI2CAddress::CI2CAddress():CommandProcessor(&EMI2CAddress)
 boolean CI2CAddress::parseParameters(int offset, Command *cmd)
 {
     // I2C:S:address
-    if(getAction() == S && offset < cmd->length())
+    if(getAction() == A_S && offset < cmd->length())
     {
         //i2cAddress = BytesToPrimitive::toInt((cmd->getCommand() + offset));
         i2cAddress = cmd->getCommand()[offset++];
         if(i2cAddress > 7 && i2cAddress < 128)
             return true;
     }
-    else if (getAction() == G)
+    else if (getAction() == A_G)
     {
         return true;
     }
@@ -358,7 +322,7 @@ boolean CI2CAddress::parseParameters(int offset, Command *cmd)
 int CI2CAddress::run()
 {
     uint8_t old = I2CConfig.getAddress();
-    if(getAction() == S || getAction() == U)
+    if(getAction() == A_S || getAction() == A_U)
     {
     I2CConfig.setAddress(i2cAddress);
     }
@@ -366,7 +330,7 @@ int CI2CAddress::run()
     I2CUtil::write(OK);
     I2CUtil::write((uint8_t)':');
     I2CUtil::write(old);
-    if(getAction() == S || getAction() == U)
+    if(getAction() == A_S || getAction() == A_U)
     {
     //I2CConfig.setAddress(i2cAddress);
     I2CUtil::write((uint8_t)':');
@@ -378,30 +342,76 @@ int CI2CAddress::run()
 CI2CAddress I2CAddress;
 // I2C-ADDRESS end
 
-EnumMap EMAref(C_CALIBRATE, "AREF");
-CAref::CAref(uint8_t pin):CommandProcessor(&EMAref)
+EnumMap EMAref(C_ADC_REF, "AREF");
+CAref::CAref():CommandProcessor(&EMAref)
 {
-      referencePin = pin;
+
 }
 
+boolean CAref::parseParameters(int offset, Command *cmd)
+{
+    // full command AREF:[G,S]:[D,E,I]
+  
+  
+    // parsing [A,D,P]
+    switch (getAction())
+    {
+    
+        case A_S:
+            if (offset < cmd->length())
+            {
+                uint8_t refType = cmd->getCommand()[offset++];
 
+                switch(refType)
+                {
+                    case 'D':
+                        arefType = DEFAULT;
+                        break;
+                    case 'E':
+                        arefType = EXTERNAL;
+                        break;
+                    case 'I':
+                        arefType = INTERNAL;
+                        break;
+                    default:
+                        return false;
+                }
+                return true;
+
+            }
+            else
+            {
+                return false;
+            }
+        case A_G:
+            return true;
+        default:
+            return false;
+    }
+    
+}
 
  int CAref::run()
  {
-      I2CUtil::write(OK);
-      I2CUtil::write((uint8_t)':');
-      I2CUtil::write((long)getAnalogAref());
-      return OK;
+    switch(getAction())
+    {
+        case A_S:
+            analogReference(getArefType());
+            break;
+        default:
+            break;
+    }
+
+    I2CUtil::write(OK);
+    I2CUtil::write((uint8_t)':');
+    I2CUtil::write((long)getArefType());
+    return OK;
 }
 
-int CAref::getAnalogAref()
+
+int CAref::getArefType()
 {
-    aRefValue = analogRead(referencePin);
-    return aRefValue;
-}
-int CAref::getAref()
-{
-    return aRefValue;
+    return arefType;
 }
 
 
@@ -425,3 +435,4 @@ EnumMap EMPing(C_PING, "PING");
 EnumMap EMMessages(C_MESSAGES, "MESSAGES");
 Counter I2CMessageCounter(&EMMessages, false);
 Counter PingCounter(&EMPing, true);
+CAref ARef;
