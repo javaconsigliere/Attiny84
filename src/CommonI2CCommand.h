@@ -8,6 +8,7 @@ class CPinIO : public CommandProcessor
   private:
     IO_TYPE iot;
     uint8_t pin;
+    
     int setValue;
 
   public:

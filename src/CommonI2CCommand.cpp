@@ -44,6 +44,26 @@ CPinIO::CPinIO():CommandProcessor(&EMIO)
 }
 
 
+
+
+IO_TYPE CPinIO::getIOT()
+{
+    return iot;
+}
+uint8_t CPinIO::getPin()
+{
+    return pin;
+}
+int CPinIO::getValue()
+{
+    return setValue;
+}
+
+
+
+
+
+
 int CPinIO::run()
 {
     int val = 0;
@@ -53,6 +73,7 @@ int CPinIO::run()
     {
         case A_S:
         case A_U:// Set or update
+        
             switch(iot)
             {
                 case IO_A:
@@ -69,8 +90,8 @@ int CPinIO::run()
             }
             if (PendingRunnable == NULL)
             {
-                if(setValue != -1)
-                    PendingRunnable = &IOPostRun;
+                
+                PendingRunnable = &IOPostRun;
                 I2CUtil::write(OK);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((uint8_t)iotchar);
@@ -83,24 +104,11 @@ int CPinIO::run()
             {
                 return CONFLICT;
             }
+        
             break;
         case A_P://provision the pin
-            switch (setValue)
-            {
-            case 'P': // pull up
-                 pinMode(PinIO.getPin(), INPUT_PULLUP);
-                break;
-            case 'I':
-                pinMode(PinIO.getPin(), INPUT);
-                break;
-            case 'O':
-                pinMode(PinIO.getPin(), OUTPUT);
-                break;
-
-            default:
-                return BAD_REQUEST;
-                
-            }
+        
+            pinMode(pin, setValue);
             iotchar = 'P';
             I2CUtil::write(OK);
             I2CUtil::write((uint8_t)':');
@@ -108,9 +116,10 @@ int CPinIO::run()
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((uint8_t)pin);
             I2CUtil::write((uint8_t)':');
-            I2CUtil::write((uint8_t)setValue);
+            I2CUtil::write((long)setValue);
             break;    
         case A_G:
+        
             switch(iot)
             {
                 case IO_A:
@@ -131,6 +140,7 @@ int CPinIO::run()
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((long)val);
             break;
+        
         default:
             break;
     }
@@ -138,90 +148,118 @@ int CPinIO::run()
 
     return OK;
 }
-
-IO_TYPE CPinIO::getIOT()
-{
-    return iot;
-}
-uint8_t CPinIO::getPin()
-{
-    return pin;
-}
-int CPinIO::getValue()
-{
-    return setValue;
-}
-
-
-
-
-
-
-
 boolean CPinIO::parseParameters(int offset, Command *cmd)
 {
     // full command IO:[G,S,U,D,P]:[A,D]:pin:[value]
-    // IO:P:[A,D]:pin:[I,O,P]
+    // IO:P:pin:[I,O,P]
     setValue = -1;
-    // parsing [A,D,P]
-    if (offset < cmd->length())
-    {
-        // char tok[2];
-        // tok[1] = 0;
-        // tok[0] = cmd->getCommand()[offset++];
-        // EnumMap *ioType = EnumMap::match(tok, &EMAnalog, &EMDigital, &EMPWM, NULL);
-        // if (ioType == NULL)
-        //     return false;
-        // iot = (IO_TYPE)ioType->map();
-
-        char ioType = cmd->getCommand()[offset++];
-
-        switch(ioType)
-        {
-            case 'A':
-                iot = IO_A;
-                break;
-            case 'D':
-                iot = IO_D;
-                break;
-            default:
-                return false;
-        }
-
-    }
-
-    if(offset  < cmd->length() && cmd->getCommand()[offset] == ':')
-    {
-        offset++;
-    }
-
-    // pin value one byte
-    if (offset < cmd->length())
-    {
-        pin = cmd->getCommand() [offset++];
-        //offset+=2;
-        
-        if(getAction() == A_G)
-        {
-            return true;
-        }
-        
-    }
     
-    if(offset < cmd->length() && cmd->getCommand()[offset] == ':')
+    // parsing [A,D,P]
+    if (getAction() == A_P)
     {
-        offset++;
-    }
-    // value
-    // value to be set
-    if (offset < cmd->length())
-    {
-        if (getAction() != A_P)
-            setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
-        else
-            setValue = cmd->getCommand()[offset];
+       if (offset < cmd->length())
+        {
+            pin = cmd->getCommand() [offset++];
+            
+        }
+        
+        if(offset < cmd->length() && cmd->getCommand()[offset] == ':')
+        {
+            offset++;
+        }
+        // value
+        // value to be set
+        if (offset < cmd->length())
+        {
 
-        return true;
+         
+                // provisioning mode
+            switch(cmd->getCommand()[offset])
+            {
+                case 'P':
+                    setValue = INPUT_PULLUP;
+                    break;
+                case 'O':
+                    setValue = OUTPUT;
+                    break;
+                case 'I':
+                    setValue = INPUT;
+                    break;
+                default:
+                    return false;
+            }
+            return true;
+            
+            
+        }
+        
+    }
+    else
+    {
+        if (offset < cmd->length())
+        {
+            switch(cmd->getCommand()[offset++])
+            {
+                case 'A':
+                    iot = IO_A;
+                    break;
+                case 'D':
+                    iot = IO_D;
+                    break;
+                default:
+                    return false;
+            }
+        }
+
+        if(offset < cmd->length() && cmd->getCommand()[offset] == ':')
+        {
+            offset++;
+        }
+
+        // pin value one byte
+        if (offset < cmd->length())
+        {
+            pin = cmd->getCommand() [offset++];
+            if(getAction() == A_G)
+            {
+                return true;
+            }
+        }
+        
+        if(offset < cmd->length() && cmd->getCommand()[offset] == ':')
+        {
+            offset++;
+        }
+        // value
+        // value to be set
+        if (offset < cmd->length())
+        {
+
+            // if (getAction() == A_P)
+            // {
+            //      // provisioning mode
+            //     switch(cmd->getCommand()[offset])
+            //     {
+            //         case 'P':
+            //             setValue = INPUT_PULLUP;
+            //             break;
+            //         case 'O':
+            //             setValue = OUTPUT;
+            //             break;
+            //         case 'I':
+            //             setValue = INPUT;
+            //             break;
+            //         default:
+            //             return false;
+            //     }
+            //     return true;
+            // }
+            // else
+            {
+                setValue = BytesToPrimitive::toInt(cmd->getCommand() + offset);
+                return true;
+            }
+        }
     }
 
     
