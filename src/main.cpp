@@ -26,7 +26,7 @@ CReset Reset(RESET_PIN_CONTROLLER);
 
 
 
-#define AREV_VOLTAGE 4.092000
+
 
 // Number of time the loop function is called
 long loopCounter = 0;
@@ -48,7 +48,7 @@ long loopCounter = 0;
 // };
 
 
-CVersion Version(DEVICE_MODEL,"1.05.86"); 
+CVersion Version(DEVICE_MODEL,"1.05.87"); 
 CUptime Uptime;
 void setup()
 {   

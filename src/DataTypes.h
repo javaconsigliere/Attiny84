@@ -2,6 +2,9 @@
 #define XLOGISTX_DATA_TYPES_h
 #include<Arduino.h>
 
+#define AREF_VOLTAGE 4.092000
+
+
 class EnumMap
 {
   private:
