@@ -4,7 +4,9 @@
 #include <CommonI2CCommand.h>
 
 
-
+/*
+  The main program for attiny family slave i2c controller
+*/
 
 
 // #ifdef PINMAPPING_CCW
