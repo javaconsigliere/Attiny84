@@ -298,7 +298,7 @@ int CUptime::run()
 
     I2CUtil::write(OK);
     I2CUtil::write((uint8_t)':');
-    I2CUtil::write((long)millis());
+    I2CUtil::write((long)(micros()/1000));
     return OK;
 }
 // UPTIME end
