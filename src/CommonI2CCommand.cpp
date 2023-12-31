@@ -99,6 +99,7 @@ int CPinIO::run()
                 I2CUtil::write((uint8_t)pin);
                 I2CUtil::write((uint8_t)':');
                 I2CUtil::write((long)val);
+                I2CUtil::flush();
             }
             else
             {
@@ -117,6 +118,7 @@ int CPinIO::run()
             I2CUtil::write((uint8_t)pin);
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((long)setValue);
+            I2CUtil::flush();
             break;    
         case A_G:
         
@@ -139,6 +141,7 @@ int CPinIO::run()
             I2CUtil::write((uint8_t)pin);
             I2CUtil::write((uint8_t)':');
             I2CUtil::write((long)val);
+            I2CUtil::flush();
             break;
         
         default:
@@ -281,6 +284,7 @@ int CCPUSpeed::run()
     I2CUtil::write(OK);
     I2CUtil::write((uint8_t)':');
     I2CUtil::write(F_CPU);
+    I2CUtil::flush();
     return OK;
 }
 CCPUSpeed CPUSpeed;
@@ -299,6 +303,7 @@ int CUptime::run()
     I2CUtil::write(OK);
     I2CUtil::write((uint8_t)':');
     I2CUtil::write((long)(micros()/1000));
+    I2CUtil::flush();
     return OK;
 }
 // UPTIME end
@@ -317,6 +322,7 @@ int CVersion::run()
     I2CUtil::write(false, model);
     I2CUtil::write((uint8_t)':');
     I2CUtil::write(false, version);
+    I2CUtil::flush();
     return OK;
 }
 // VERSION END
@@ -374,6 +380,7 @@ int CI2CAddress::run()
     I2CUtil::write((uint8_t)':');
     I2CUtil::write(I2CConfig.getAddress());
     }
+    I2CUtil::flush();
     return OK;
 }
 
@@ -443,6 +450,7 @@ boolean CAref::parseParameters(int offset, Command *cmd)
     I2CUtil::write(OK);
     I2CUtil::write((uint8_t)':');
     I2CUtil::write((long)getArefType());
+    I2CUtil::flush();
     return OK;
 }
 
@@ -463,6 +471,7 @@ int  Counter::run()
     I2CUtil::write(OK);
     I2CUtil::write((uint8_t)':');
     I2CUtil::write(val);
+    I2CUtil::flush();
     
     return OK;
 }

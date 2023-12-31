@@ -14,17 +14,18 @@ class I2CUtil
   
 
   public:
-   static void write(uint8_t b);
-   static void write(int i);
-   static void write(long l);
-   static void write(float f);
-   static void write(const char * str);
-   static void write(bool writeLength, const char * str);
-
-   static void writeReverse(uint8_t *b, int len);
-   static void request(int);
-   static void response();
-   static void setup();
+    static void write(uint8_t b);
+    static void write(int i);
+    static void write(long l);
+    static void write(float f);
+    static void write(const char * str);
+    static void write(bool writeLength, const char * str);
+    static void flush();
+    
+    static void writeReverse(uint8_t *b, int len);
+    static void request(int);
+    static void response();
+    static void setup();
 };
 
 

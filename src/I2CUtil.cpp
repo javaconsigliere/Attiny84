@@ -62,8 +62,12 @@ void I2CUtil::write(uint8_t b)
 
 void I2CUtil::write(const char * str)
 {
-  I2CUtil::write(true, str);
-  
+  I2CUtil::write(true, str);  
+}
+
+void I2CUtil::flush()
+{
+  Wire.flush();
 }
 
 void I2CUtil::write(bool writeLength, const char * str)
@@ -173,7 +177,7 @@ void I2CUtil::request(int howMany)
 void I2CUtil::response()
 {
     if(command.length() > 0)
-   {
+    {
      //int index = 0;
      
      CommandProcessor *rp = CommandManager.parse(&command);
@@ -187,15 +191,18 @@ void I2CUtil::response()
           I2CUtil::write(-1L);
        }
      }
-    else
-    {
+     else
+     {
       I2CUtil::write(NOT_FOUND);
       I2CUtil::write((uint8_t)':');
       I2CUtil::write(-1L);
+     }
     }
-   }
-   else
-      I2CUtil::write(I2CConfig.getAddress());
+    else
+    {
+        I2CUtil::write(I2CConfig.getAddress());    
+    }
+    I2CUtil::flush();
 
    command.reset();
 }

@@ -57,7 +57,7 @@ class CommandProcessor : public Runnable
       
   protected:
     EnumMap *command;
-     ACTION action;
+    ACTION action;
   public:
     CommandProcessor(EnumMap *c);
     virtual boolean parseParameters(int offset, Command *cmd);
