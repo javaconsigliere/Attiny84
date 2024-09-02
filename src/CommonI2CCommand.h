@@ -61,6 +61,16 @@ class CI2CAddress : public CommandProcessor
 
 };
 
+
+class CWriteRegister : public CommandProcessor
+{
+    private:
+    public:
+      CWriteRegister();
+      int run();
+      boolean parseParameters(int offset, Command *cmd);
+};
+
 class Counter : public CommandProcessor
 {
   private:

@@ -50,7 +50,7 @@ long loopCounter = 0;
 // };
 
 
-CVersion Version(DEVICE_MODEL,"1.06.02"); 
+CVersion Version(DEVICE_MODEL,"1.06.03"); 
 CUptime Uptime;
 void setup()
 {   
