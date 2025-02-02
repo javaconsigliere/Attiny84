@@ -2,7 +2,7 @@
 #include <I2CUtil.h>
 #include <Command.h>
 #include <CommonI2CCommand.h>
-
+#include <ActionMonitor.h>
 
 /*
   The main program for attiny family slave i2c controller
@@ -23,6 +23,8 @@ CReset Reset(RESET_PIN_CONTROLLER);
 
 #elif defined (__AVR_ATtiny85__)   
 #define  DEVICE_MODEL "85-I2C"  
+ActionMonitor actionMonitor(PB1, PB3, PB4);
+
 #endif
 
 
@@ -54,6 +56,8 @@ CVersion Version(DEVICE_MODEL,"1.06.03");
 CUptime Uptime;
 void setup()
 {   
+
+
   // register the I2C commands
   // Count I2C messages
   CommandManager.add(&I2CMessageCounter);
@@ -85,11 +89,11 @@ void setup()
 
     
   // set the i2c protocol 
-  I2CUtil::setup();
+    I2CUtil::setup();
 
-  //ARef.getAnalogAref(); // ARef value
-    
-    
+    //ARef.getAnalogAref(); // ARef value
+  
+    ARef.setArefType(DEFAULT);
 
     //TCCR1B = TCCR1B & B11111000 | B00000001; //this changes the PWM frequency to 32kHz
 }
@@ -101,6 +105,12 @@ void loop()
   // adding delays due to i2c issues
   #if defined (__AVR_ATtiny84__) 
     delay(1);
+  
+  #endif
+
+  #if defined (__AVR_ATtiny85__) 
+    delay(100);
+    actionMonitor.monitor();
   #endif
   if(PendingRunnable != NULL)
   {

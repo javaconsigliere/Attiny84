@@ -112,6 +112,7 @@ class CAref:public CommandProcessor
     boolean parseParameters(int offset, Command *cmd);
 
     int getArefType();
+    void setArefType(int arefType);
     
 };
 

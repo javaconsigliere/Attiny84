@@ -453,6 +453,11 @@ boolean CAref::parseParameters(int offset, Command *cmd)
     I2CUtil::flush();
     return OK;
 }
+void CAref::setArefType(int arefType)
+{
+    this->arefType = arefType;
+    analogReference(getArefType());
+}
 
 
 int CAref::getArefType()
