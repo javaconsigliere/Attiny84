@@ -4,6 +4,8 @@
 #include <CommonI2CCommand.h>
 #include <ActionMonitor.h>
 
+
+CActionMonitor *ActionMonitor = NULL;
 /*
   The main program for attiny family slave i2c controller
 */
@@ -18,13 +20,11 @@
 #define DEVICE_MODEL "84-I2C"
 #define RESET_PIN_CONTROLLER PB1
 // ATTINY84 specififc
-
 CReset Reset(RESET_PIN_CONTROLLER);
 
 #elif defined (__AVR_ATtiny85__)   
-#define  DEVICE_MODEL "85-I2C"  
-ActionMonitor actionMonitor(PB1, PB3, PB4);
-
+#define  DEVICE_MODEL "85-I2C"
+CActionMonitor oActionMonitor(500, PB1, PB3, PB4);
 #endif
 
 
@@ -52,7 +52,7 @@ long loopCounter = 0;
 // };
 
 
-CVersion Version(DEVICE_MODEL,"1.06.03"); 
+CVersion Version(DEVICE_MODEL,"1.06.04"); 
 CUptime Uptime;
 void setup()
 {   
@@ -83,17 +83,15 @@ void setup()
     // ATyiney84 support reset
     // other controller like ATyiney85 does not
     CommandManager.add(&Reset);
-    
 #endif
 
-
-    
   // set the i2c protocol 
-    I2CUtil::setup();
+  I2CUtil::setup();  
+  ARef.setArefType(DEFAULT);
 
-    //ARef.getAnalogAref(); // ARef value
-  
-    ARef.setArefType(DEFAULT);
+#if defined (__AVR_ATtiny85__)   
+  ActionMonitor = &oActionMonitor;
+#endif
 
     //TCCR1B = TCCR1B & B11111000 | B00000001; //this changes the PWM frequency to 32kHz
 }
@@ -105,13 +103,15 @@ void loop()
   // adding delays due to i2c issues
   #if defined (__AVR_ATtiny84__) 
     delay(1);
-  
   #endif
 
-  #if defined (__AVR_ATtiny85__) 
-    delay(100);
-    actionMonitor.monitor();
-  #endif
+
+
+  if (PendingRunnable == NULL && ActionMonitor != NULL && ActionMonitor->monitor(100))
+      PendingRunnable = ActionMonitor;
+  
+
+
   if(PendingRunnable != NULL)
   {
     PendingRunnable->run();

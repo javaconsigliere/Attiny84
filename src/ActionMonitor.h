@@ -2,31 +2,41 @@
 #define XLOGISTX_ACTION_MONITOR_h
 
 #include <Arduino.h>
+#include <DataTypes.h>
 
 
-class ActionMonitor {
+class CActionMonitor: public Runnable {
 protected:
   uint8_t outputPin;  // The output pin number.
   uint8_t mainInput;
   uint8_t triggerInput;
-
+  bool currentState = false;
+  unsigned long postDelay;
 public:
   /**
    * Constructor:
-   * @param outPin The output pin number.
-   * @param inPins An initializer_list of input pin numbers.
+   * @param extraDelay extra delay to add after execution
+   * @param outPin The output pin number to control pump.
+   * @param inMain The main pin if low monitor will return 0.
+   * @param inTrigger in low and inMain is high monitor will set outPin high and return extraDelay, otherwise return 0 and outPin is low
    */
-   ActionMonitor(uint8_t outPin, uint8_t inMain, uint8_t inTrigger);
+   CActionMonitor(unsigned long postDelay, uint8_t outPin, uint8_t inMain, uint8_t inTrigger);
 
-
+  int run();
 
   /**
-   * Virtual function to monitor the input pins.
-   * Default behavior: if any input pin reads HIGH,
-   * the output pin is set HIGH; otherwise, it is set LOW.
-   * This function can be overridden in a derived class for custom behavior.
+   * Virtual function to monitor the inMai and inTrigger.
+   * Default behavior: if inMain && !intrigger is high set outPin on and return extra delay
+   * otherwise outPin off and return 0
+   * @delay 
+   * @return true if trigger activated
    */
-  virtual void monitor();
+  bool monitor(unsigned long delay);
+
+  void setOutPin(boolean state);
+  bool getOutPin();
+
+  bool getCurrentState();
 
 
 };
