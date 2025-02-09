@@ -42,5 +42,5 @@ public:
 };
 
 
-
+extern CActionMonitor *ActionMonitor;
 #endif

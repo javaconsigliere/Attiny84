@@ -58,3 +58,4 @@ bool CActionMonitor::getCurrentState()
     return currentState;
 }
 
+CActionMonitor *ActionMonitor = NULL;

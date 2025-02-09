@@ -5,7 +5,6 @@
 #include <ActionMonitor.h>
 
 
-CActionMonitor *ActionMonitor = NULL;
 /*
   The main program for attiny family slave i2c controller
 */
