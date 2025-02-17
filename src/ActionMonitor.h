@@ -33,10 +33,20 @@ public:
    */
   bool monitor(unsigned long delay);
 
-  void setOutPin(boolean state);
-  bool getOutPin();
+  void setOutPinState(boolean state);
+  bool getOutPinState();
 
   bool getCurrentState();
+
+  uint8_t getOutPin();
+  void setOutPin(uint8_t outPing);
+
+  uint8_t getInMainPin();
+  void setInMainPin(uint8_t pin);
+
+  uint8_t getInTriggerPin();
+  void setInTriggerPin(uint8_t pin);
+  
 
 
 };

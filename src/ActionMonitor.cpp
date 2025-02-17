@@ -27,15 +27,15 @@ bool CActionMonitor::monitor(unsigned long toDelay)
     
 
     // if current state is off but the output pin is on set to false
-    if(!currentState && getOutPin())
-        setOutPin(false);
+    if(!currentState && getOutPinState())
+        setOutPinState(false);
 
     return getCurrentState();
 }
 
 int CActionMonitor::run()
 {
-    setOutPin(getCurrentState());
+    setOutPinState(getCurrentState());
     
     if (getCurrentState() && postDelay > 0)
         delay(postDelay);
@@ -43,12 +43,21 @@ int CActionMonitor::run()
     return currentState;
 }
 
-void CActionMonitor::setOutPin(boolean state)
+void CActionMonitor::setOutPinState(boolean state)
 {
     digitalWrite(outputPin, state);
 }
 
-bool CActionMonitor::getOutPin()
+void CActionMonitor::setOutPin(uint8_t pin)
+{
+    outputPin = pin;
+}
+uint8_t CActionMonitor::getOutPin()
+{
+    return outputPin;
+}
+
+bool CActionMonitor::getOutPinState()
 {
     return digitalRead(outputPin);
 }
@@ -57,5 +66,25 @@ bool CActionMonitor::getCurrentState()
 {
     return currentState;
 }
+
+uint8_t CActionMonitor::getInMainPin()
+{
+    return mainInput;
+}
+void CActionMonitor::setInMainPin(uint8_t pin)
+{
+    mainInput = pin;
+}
+
+uint8_t CActionMonitor::getInTriggerPin()
+{
+    return triggerInput;
+}
+void CActionMonitor::setInTriggerPin(uint8_t pin)
+{
+    triggerInput = pin;
+}
+
+
 
 CActionMonitor *ActionMonitor = NULL;
