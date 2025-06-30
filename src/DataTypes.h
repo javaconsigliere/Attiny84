@@ -34,9 +34,9 @@ enum DATA_TYPE
 
 enum ACTION
 {
- A_G,
- A_S,
- A_U,
+ A_G, // get
+ A_S, // set
+ A_U, // update
  A_D,
  A_P
 };
