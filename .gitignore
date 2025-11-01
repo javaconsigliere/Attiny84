@@ -6,6 +6,7 @@
 include
 lib
 .vscode
+.idea
 test
 platformio.ini
 
