@@ -4,7 +4,7 @@
 
 
 #define CHECK_ARRAY_SIZE 5
-#define I2C_DEFAULT_SLAVE_ADDRESS 0x4
+#define I2C_DEFAULT_SLAVE_ADDRESS 0x9
 Command command = Command();
 I2C_Config::I2C_Config()
 {

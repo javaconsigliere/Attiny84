@@ -35,8 +35,8 @@ class I2C_Config
 	  uint8_t i2cAddress = 0;
 	
   public:
- 	  I2C_Config();
-    void setAddress(uint8_t I2CSlaveAddres);
+	I2C_Config();
+	void setAddress(uint8_t I2CSlaveAddres);
     uint8_t getAddress();
 };
 
