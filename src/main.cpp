@@ -18,7 +18,7 @@
 #if defined (__AVR_ATtiny84__)
 #define DEVICE_MODEL "84-I2C"
 #define RESET_PIN_CONTROLLER PB1
-// ATTINY84 specififc
+// ATTINY84 specific
 CReset Reset(RESET_PIN_CONTROLLER);
 
 #elif defined (__AVR_ATtiny85__)   
@@ -51,7 +51,7 @@ long loopCounter = 0;
 // };
 
 
-CVersion Version(DEVICE_MODEL,"1.06.06");
+CVersion Version(DEVICE_MODEL,"1.06.07");
 CUptime Uptime;
 void setup()
 {   
