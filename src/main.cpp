@@ -18,6 +18,8 @@
 #if defined (__AVR_ATtiny84__)
 #define DEVICE_MODEL "84-I2C"
 #define RESET_PIN_CONTROLLER PB1
+// Future value in new board v4.3>
+// #define RESET_PIN_CONTROLLER PB3
 // ATTINY84 specific
 CReset Reset(RESET_PIN_CONTROLLER);
 
