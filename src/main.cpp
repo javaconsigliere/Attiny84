@@ -26,6 +26,8 @@ CReset Reset(RESET_PIN_CONTROLLER);
 #elif defined (__AVR_ATtiny85__)   
 #define  DEVICE_MODEL "85-I2C"
 CActionMonitor oActionMonitor(500, PB1, PB3, PB4);
+#elif defined (__AVR_ATmega328P__)
+#define DEVICE_MODEL "328-I2C"
 #endif
 
 
